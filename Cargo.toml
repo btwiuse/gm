@@ -6,6 +6,9 @@ license = "MIT"
 authors = ["Gear Technologies", "Hangbiao Zou (btwiuse)"]
 description = "Gear Multitoken"
 
+[lib]
+path = "lib.rs"
+
 [dependencies]
 gstd = { git = "https://github.com/gear-tech/gear.git", features = ["debug"] }
 
