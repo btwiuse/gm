@@ -1,9 +1,10 @@
 [package]
-name = "app"
+name = "gm"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-authors = ["Gear Technologies"]
+authors = ["Gear Technologies", "Hangbiao Zou (btwiuse)"]
+description = "Gear Multitoken"
 
 [dependencies]
 gstd = { git = "https://github.com/gear-tech/gear.git", features = ["debug"] }
