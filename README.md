@@ -4,7 +4,7 @@
   </a>
 </p>
 
-# Gear Template App
+# ⚙️ GM
 
 [![Build][build_badge]][build_href]
 [![License][lic_badge]][lic_href]
@@ -17,9 +17,7 @@
 
 <!-- Description starts here -->
 
-Template application. Use this repository as a template when creating a new application repo.
-
-> https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template
+GM stands for: Good Morning / Great Move / Gear Multitoken / General Mint / ...
 
 <!-- End of description -->
 
