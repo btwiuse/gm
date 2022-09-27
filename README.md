@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://gitpod.io/#https://github.com/gear-dapps/app" target="_blank">
+  <a href="https://gitpod.io/#https://github.com/btwiuse/gm" target="_blank">
     <img src="https://gitpod.io/button/open-in-gitpod.svg" width="240" alt="Gitpod">
   </a>
 </p>
@@ -9,11 +9,11 @@
 [![Build][build_badge]][build_href]
 [![License][lic_badge]][lic_href]
 
-[build_badge]: https://github.com/gear-dapps/app/workflows/Build/badge.svg
-[build_href]: https://github.com/gear-dapps/app/actions/workflows/build.yml
+[build_badge]: https://github.com/btwiuse/gm/workflows/Build/badge.svg
+[build_href]: https://github.com/btwiuse/gm/actions/workflows/build.yml
 
 [lic_badge]: https://img.shields.io/badge/License-MIT-success
-[lic_href]: https://github.com/gear-dapps/app/blob/master/LICENSE
+[lic_href]: https://github.com/btwiuse/gm/blob/master/LICENSE
 
 <!-- Description starts here -->
 
@@ -26,14 +26,14 @@ Template application. Use this repository as a template when creating a new appl
 ## Initial checklist after creating a new repo
 
 - [ ] Change app name in `Cargo.toml`
-- [ ] Fix Gitpod/badge/releases links in `README.md` (replace `gear-dapps/app` with `gear-dapps/<my-new-app>`)
+- [ ] Fix Gitpod/badge/releases links in `README.md` (replace `btwiuse/gm` with `gear-dapps/<my-new-app>`)
 - [ ] Add description in `README.md`
 - [ ] Fix dates, links, and initial commit hash in `CHANGELOG.md`
 - [ ] Remove this section
 
 ## Prebuilt Binaries
 
-Raw, optimized, and meta WASM binaries can be found in the [Releases section](https://github.com/gear-dapps/app/releases).
+Raw, optimized, and meta WASM binaries can be found in the [Releases section](https://github.com/btwiuse/gm/releases).
 
 ## Building Locally
 
