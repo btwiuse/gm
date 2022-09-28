@@ -1,10 +1,10 @@
 [package]
-name = "gm"
+name = "memo"
 version = "0.1.0"
 edition = "2021"
+description = "a gear contract that logs its input"
 license = "MIT"
-authors = ["Gear Technologies", "Hangbiao Zou (btwiuse)"]
-description = "Gear Multitoken"
+authors = ["btwiuse"]
 
 [lib]
 path = "lib.rs"
@@ -17,8 +17,3 @@ gtest = { git = "https://github.com/gear-tech/gear.git" }
 
 [build-dependencies]
 gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git" }
-
-[workspace]
-members = [
-  "labs/*",
-]
