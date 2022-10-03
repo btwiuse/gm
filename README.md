@@ -6,12 +6,10 @@
 
 # ⚙️ GM
 
-[![Build][build_badge]][build_href]
-[![License][lic_badge]][lic_href]
+[![Build][build_badge]][build_href] [![License][lic_badge]][lic_href]
 
 [build_badge]: https://github.com/btwiuse/gm/workflows/Build/badge.svg
 [build_href]: https://github.com/btwiuse/gm/actions/workflows/build.yml
-
 [lic_badge]: https://img.shields.io/badge/License-MIT-success
 [lic_href]: https://github.com/btwiuse/gm/blob/master/LICENSE
 
@@ -23,7 +21,8 @@ GM stands for: Good Morning / Great Move / Gear Multitoken / General Mint / ...
 
 ## Prebuilt Binaries
 
-Raw, optimized, and meta WASM binaries can be found in the [Releases section](https://github.com/btwiuse/gm/releases).
+Raw, optimized, and meta WASM binaries can be found in the
+[Releases section](https://github.com/btwiuse/gm/releases).
 
 ## Building Locally
 
