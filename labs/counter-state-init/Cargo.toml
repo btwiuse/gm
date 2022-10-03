@@ -1,8 +1,8 @@
 [package]
-name = "echo"
+name = "counter-state-init"
 version = "0.1.0"
 edition = "2021"
-description = "a gear contract that echos back its input"
+description = "a gear contract that counts"
 license = "MIT"
 authors = ["btwiuse"]
 
@@ -11,6 +11,7 @@ path = "lib.rs"
 
 [dependencies]
 gstd = { git = "https://github.com/btwiuse/gear.git", features = ["debug"] }
+codec = { package = "parity-scale-codec", version = "3.1.2", default-features = false, features = ["derive"] }
 
 [dev-dependencies]
 gtest = { git = "https://github.com/btwiuse/gear.git" }

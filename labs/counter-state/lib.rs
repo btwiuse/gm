@@ -1,8 +1,23 @@
 #![no_std]
 
+use codec::Encode;
 use gstd::{debug, msg, prelude::*};
 
 static mut PAYLOADS: Vec<String> = vec![];
+
+gstd::metadata! {
+    title: "counter-state",
+    state:
+        input: String,
+        output: u32,
+}
+
+#[no_mangle]
+unsafe extern "C" fn meta_state() -> *mut [i32; 2] {
+    let input: String = msg::load().expect("failed to decode input argument");
+    let encoded = (PAYLOADS.len() as u32).encode();
+    gstd::util::to_leak_ptr(encoded)
+}
 
 #[no_mangle]
 unsafe extern "C" fn handle() {

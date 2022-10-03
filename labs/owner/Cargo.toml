@@ -1,8 +1,8 @@
 [package]
-name = "echo"
+name = "owner"
 version = "0.1.0"
 edition = "2021"
-description = "a gear contract that echos back its input"
+description = "a gear contract that tells who i am"
 license = "MIT"
 authors = ["btwiuse"]
 

@@ -1,9 +1,38 @@
 #![no_std]
 
+use codec::Encode;
+use gstd::msg;
+use gstd::prelude::*;
+
 #[no_mangle]
 unsafe extern "C" fn handle() {
     // without this line test panics
     gstd::msg::load_bytes();
+}
+
+gstd::metadata! {
+    title: "strlen",
+    state:
+        input: String,
+        output: u32,
+}
+
+#[no_mangle]
+unsafe extern "C" fn meta_state() -> *mut [i32; 2] {
+    let input: String = msg::load().expect("failed to decode input argument");
+    let encoded = (input.len() as u32).encode();
+    /*
+    match person {
+        None => WALLETS.encode(),
+        Some(lookup_id) => WALLETS
+            .iter()
+            .filter(|w| w.id == lookup_id)
+            .cloned()
+            .collect::<Vec<Wallet>>()
+            .encode(),
+    };
+    */
+    gstd::util::to_leak_ptr(encoded)
 }
 
 #[cfg(test)]

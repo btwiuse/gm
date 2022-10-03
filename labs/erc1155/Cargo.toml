@@ -1,8 +1,8 @@
 [package]
-name = "echo"
+name = "erc1155"
 version = "0.1.0"
 edition = "2021"
-description = "a gear contract that echos back its input"
+description = "a gear contract implementing the Ownable & Ledger trait"
 license = "MIT"
 authors = ["btwiuse"]
 
@@ -11,6 +11,7 @@ path = "lib.rs"
 
 [dependencies]
 gstd = { git = "https://github.com/btwiuse/gear.git", features = ["debug"] }
+num-traits = { version = "0.2", default-features = false }
 
 [dev-dependencies]
 gtest = { git = "https://github.com/btwiuse/gear.git" }

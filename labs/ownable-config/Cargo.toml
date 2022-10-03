@@ -1,8 +1,8 @@
 [package]
-name = "echo"
+name = "ownable-config"
 version = "0.1.0"
 edition = "2021"
-description = "a gear contract that echos back its input"
+description = "a gear contract implementing the Ownable trait"
 license = "MIT"
 authors = ["btwiuse"]
 
