@@ -5,16 +5,13 @@ use crate::*;
 /// Contract struct
 pub struct Contract<T: IConfig> {
     pub owner: T::AccountId,
-    pub total_issuance: T::AccountBalance,
+    // pub total_issuance: T::AccountBalance,
     pub name: T::Text,
     pub symbol: T::Text,
-    pub decimals: T::TokenDecimal,
-    // https://eips.ethereum.org/EIPS/eip-1046
-    // pub token_uri: T::Text,
     pub base_uri: T::Text,
-    pub metadata_registry: BTreeMap<T::TokenId, TokenMetadata>,
     pub balances: BTreeMap<T::TokenId, BTreeMap<T::AccountId, T::AccountBalance>>,
     pub approvals: BTreeMap<T::AccountId, BTreeMap<T::AccountId, bool>>,
+    pub metadata_registry: BTreeMap<T::TokenId, TokenMetadata>,
 }
 
 /// constructor method
@@ -27,20 +24,17 @@ impl<T: IConfig> Contract<T> {
     }
 }
 
-/// Default interface
 impl<T: IConfig> Default for Contract<T> {
     fn default() -> Self {
         Self {
+            owner: T::AccountId::zero(),
+            // total_issuance: T::AccountBalance::default(),
             name: T::Text::default(),
             symbol: T::Text::default(),
-            total_issuance: T::AccountBalance::default(),
-            decimals: T::TokenDecimal::default(),
-            // token_uri: T::Text::default(),
-            owner: T::AccountId::zero(),
             base_uri: T::Text::default(),
-            metadata_registry: BTreeMap::<T::TokenId, TokenMetadata>::default(),
             balances: BTreeMap::<T::TokenId, BTreeMap<T::AccountId, T::AccountBalance>>::default(),
             approvals: BTreeMap::<T::AccountId, BTreeMap<T::AccountId, bool>>::default(),
+            metadata_registry: BTreeMap::<T::TokenId, TokenMetadata>::default(),
         }
     }
 }
@@ -104,18 +98,6 @@ impl<T: IConfig> IERC1155<T> for Contract<T> {
                 .and_modify(|v| *v = v.saturating_add(&amount))
                 .or_insert(amount);
         });
-
-        /*
-        self.balances.entry(token).and_modify(|kv| {
-            kv.entry(to)
-                .and_modify(|v| *v = v.saturating_add(&amount))
-                .or_insert(amount);
-        }).or_insert({
-            let mut btm = BTreeMap::new();
-            btm.insert(to, amount);
-            btm
-        });
-        */
     }
     fn safe_batch_transfer_from(
         &mut self,
@@ -135,9 +117,16 @@ impl<T: IConfig> IERC1155<T> for Contract<T> {
         operator: T::AccountId,
         approved: bool,
     ) {
-        self.approvals.entry(owner).and_modify(|kv| {
-            kv.entry(operator).and_modify(|v| *v = approved);
-        });
+        self.approvals
+            .entry(owner)
+            .and_modify(|kv| {
+                kv.entry(operator).and_modify(|v| *v = approved);
+            })
+            .or_insert({
+                let mut btm = BTreeMap::new();
+                btm.insert(operator, approved);
+                btm
+            });
     }
     fn is_approved_for_all(&self, owner: T::AccountId, operator: T::AccountId) -> bool {
         self.approvals
@@ -227,7 +216,7 @@ impl<T: IConfig> ITokenMetadataRegistry<T> for Contract<T> {
     }
 }
 
-/// ERC1155Ext interface
+/// ERC1155GearExt interface
 impl IERC1155GearExt for Contract<GearConfig> {
     fn emit_transfer_single_event(
         &self,

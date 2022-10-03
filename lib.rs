@@ -115,6 +115,8 @@ pub trait IERC1155<T: IConfig> {
 }
 
 /// configuration trait that abstracts contract implementation from concrete types
+///
+/// making the contract testable without gear dependencies
 pub trait IConfig {
     type AccountId: IAccountId;
     type AccountBalance: IAccountBalance;
@@ -176,9 +178,12 @@ impl IText for String {
     }
 }
 
-/// define IZero trait and implement it for ActorId
+/// define IZero trait required by IAccountId and implement it for ActorId and u8
+/// for gear and testing environments respectively
 mod zero {
     use crate::*;
+
+    /// IZero is a trait with methods for obtaining / comparing with the zero address
     pub trait IZero {
         fn zero() -> Self;
         fn is_zero(&self) -> bool;
@@ -193,6 +198,7 @@ mod zero {
         }
     }
 
+    // u8 is used as AccountId in contract_test.rs
     impl IZero for u8 {
         fn zero() -> Self {
             0u8

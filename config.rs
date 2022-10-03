@@ -1,8 +1,10 @@
 //! contract associated types configuration
 //!
-//! GearConfig is used in formal code. For testing purpose, the TestConfig is preferred.
+//! GearConfig is used in formal code. For testing purpose, TestConfig is preferred.
 //!
 //! In TestConfig, the account id type is set to u8 in order to simplify writing account id literals in tests
+//!
+//! see contract_test.rs
 
 use crate::*;
 

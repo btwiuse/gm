@@ -17,6 +17,74 @@
 
 GM stands for: Good Morning / Great Move / Gear Multitoken / General Mint / ...
 
+A loose implementation of the ERC1155 multitoken standard for Gear
+
+⚠️ Unaudited and not production ready
+
+Directory layout:
+
+```
+.
+├── lib.rs            // High level abstractions and trait definitions: IERC1155, IERC1155GearExt, ITokenMetadataRegistry, ...
+├── codec.rs          // Encoder and Decoder types for contract IO: initialization, transaction input, events, state query, token metadata
+├── config.rs         // Provides implementations to IConfig for standard and testing environment: GearConfig, TestConfig
+├── contract.rs       // Contract<T: IConfig> implements IERC1155, IERC1155GearExt, ITokenMetadataRegistry, ...
+├── contract_test.rs  // contract core logic related tests, using TestConfig, without explicit dependency on gstd, gtest
+
+├── state.rs          // pub static mut STATE: Option<Contract<GearConfig>>
+├── metadata.rs       // gstd::metadata!
+├── handle.rs         // fn handle()
+├── init.rs           // fn init()
+├── query.rs          // fn meta_state()
+
+├── handle_test.rs    // fn handle() related tests
+├── init_test.rs      // fn init() related tests
+├── query_test.rs     // fn meta_state() related tests
+
+└── build.rs          // cargo build script
+```
+
+The main contract implementation is in [contract.rs](./contract.rs). It applies
+the generics pattern mentioned in
+
+https://github.com/shawntabrizi/substrate-trait-tutorial/blob/master/src/step5.rs
+
+making the core contract logic testable without relying on gear specific crates.
+
+features:
+
+- support any combination of fungible and non-fungible tokens;
+  - see [IERC1155](./lib.rs) trait and [implementation](./contract.rs)
+- able to transfer, mint or burn several tokens at once;
+  - see [IERC1155Ext](./lib.rs) trait and [implementation](./contract.rs)
+- emit events when transactions succeed
+  - see [IERC1155GearExt](./lib.rs) trait and [implementation](./contract.rs)
+- approval management and token metadata.
+  - see [ITokenMetadataRegistry](./lib.rs) trait and
+    [implementation](./contract.rs)
+  - the token metadata manager works similar to Metaplex Token Metadata program
+    on Solana. It manages token metadata for both fungible and non fungible
+    tokens. The token metadata is empty by default and is set separately after
+    mint using the `update_token_metadata` method
+- basic contract ownership management, access control.
+  - see [IOwnable](./lib.rs) trait and [implementation](./contract.rs)
+
+TODO:
+
+- [x] Decouple contract implementation from Gear specific types
+- [x] Add codec types
+- [x] Support contract state query
+- [x] Emit events using `msg::reply`
+- [x] Add basic tests for `contract.rs`, `init.rs`, `query.rs`, `handle.rs`
+- [x] implement ERC1155 batch operations
+- [ ] Perform sanity checks on user input in `mint`, `mint_batch`,
+      `safe_transfer_from`, `safe_batch_transfer_from`, etc. before any state
+      mutation. Currently implementation doesn't handle untrusted input very
+      well.
+- [ ] Comprehensive testing covering all possible bad cases. Currently there are
+      only a few good cases
+- [ ] Submit result
+
 <!-- End of description -->
 
 ## Prebuilt Binaries
