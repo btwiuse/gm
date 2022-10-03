@@ -62,6 +62,9 @@ features:
     invoked before IERC1155Check methods.
 - able to transfer, mint or burn several tokens at once;
   - see [IERC1155Ext](./lib.rs) trait and [implementation](./contract.rs)
+  - implementation caveat: `mint` the same token id twice is forbidden, which
+    means the total supply of any minted token will not increase after they are
+    minted
 - emit events when transactions succeed
   - see [IERC1155GearExt](./lib.rs) trait and [implementation](./contract.rs)
   - events are always emitted after the transaction is made
@@ -91,7 +94,7 @@ TODO:
       invoking `mint`, `mint_batch`, `safe_transfer_from`,
       `safe_batch_transfer_from`, etc. before any state mutation.
 - [ ] Comprehensive testing covering all possible bad cases. Currently there are
-      only a few good cases
+      only a few good cases (need help: how to handle panic cases?)
 - [ ] Submit result
 
 <!-- End of description -->

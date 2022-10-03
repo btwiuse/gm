@@ -6,8 +6,6 @@ use crate::*;
 unsafe extern "C" fn handle() {
     let signer: ActorId = msg::source();
     let origin: ActorId = exec::origin();
-    debug!("signer: {:?}", signer);
-    debug!("origin: {:?}", origin);
     let state = STATE.as_mut().expect("Could not get state");
     let input: Input = msg::load().expect("Could not load msg");
     match input {

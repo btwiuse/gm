@@ -104,7 +104,7 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
         _signer: T::AccountId,
         _origin: T::AccountId,
         to: T::AccountId,
-        _token: T::TokenId,
+        token: T::TokenId,
         amount: T::AccountBalance,
     ) {
         if to.is_zero() {
@@ -112,6 +112,9 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
         }
         if amount.is_zero() {
             panic!("cannot mint 0 amount")
+        }
+        if self.balances.get(&token).is_some() {
+            panic!("cannot mint twice")
         }
     }
     fn check_mint_batch(
