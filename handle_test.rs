@@ -43,7 +43,7 @@ fn mint_works() {
 }
 
 #[test]
-fn batch_mint_works() {
+fn mint_batch_works() {
     let system = System::new();
     system.init_logger();
 

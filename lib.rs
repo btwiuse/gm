@@ -4,7 +4,7 @@
 #![feature(trait_alias)]
 #![no_std]
 
-use gstd::{debug, msg, prelude::*, ActorId};
+use gstd::{debug, exec, msg, prelude::*, ActorId};
 
 pub mod codec;
 pub mod config;
@@ -30,6 +30,75 @@ pub use state::STATE;
 pub trait IOwnable<T: IConfig> {
     fn owner(&self) -> T::AccountId;
     fn is_owner(&self, who: &T::AccountId) -> bool;
+}
+
+/// ERC1155 interface check extension
+pub trait IERC1155Check<T: IConfig> {
+    fn check_transfer_from(
+        &mut self,
+        signer: T::AccountId,
+        origin: T::AccountId,
+        from: T::AccountId,
+        to: T::AccountId,
+        token: T::TokenId,
+        amount: T::AccountBalance,
+    );
+    fn check_batch_transfer_from(
+        &mut self,
+        signer: T::AccountId,
+        origin: T::AccountId,
+        from: T::AccountId,
+        to: T::AccountId,
+        token: Vec<T::TokenId>,
+        amount: Vec<T::AccountBalance>,
+    );
+    fn check_mint(
+        &mut self,
+        signer: T::AccountId,
+        origin: T::AccountId,
+        to: T::AccountId,
+        token: T::TokenId,
+        amount: T::AccountBalance,
+    );
+    fn check_mint_batch(
+        &mut self,
+        signer: T::AccountId,
+        origin: T::AccountId,
+        to: T::AccountId,
+        token: Vec<T::TokenId>,
+        amount: Vec<T::AccountBalance>,
+    );
+    fn check_set_approval_for_all(
+        &mut self,
+        signer: T::AccountId,
+        origin: T::AccountId,
+        owner: T::AccountId,
+        operator: T::AccountId,
+        approved: bool,
+    );
+    fn check_burn(
+        &mut self,
+        signer: T::AccountId,
+        origin: T::AccountId,
+        from: T::AccountId,
+        token: T::TokenId,
+        amount: T::AccountBalance,
+    );
+    fn check_burn_batch(
+        &mut self,
+        signer: T::AccountId,
+        origin: T::AccountId,
+        from: T::AccountId,
+        token: Vec<T::TokenId>,
+        amount: Vec<T::AccountBalance>,
+    );
+    fn check_update_token_metadata(
+        &mut self,
+        signer: T::AccountId,
+        origin: T::AccountId,
+        token: T::TokenId,
+        metadata: Option<TokenMetadata>,
+    );
 }
 
 /// ERC1155 interface gear extension
@@ -146,6 +215,7 @@ pub trait IAccountBalance = num_traits::Zero
     + fmt::Debug
     + Copy
     + Clone
+    + PartialOrd
     + Default
     + From<u16>
     + From<u32>;

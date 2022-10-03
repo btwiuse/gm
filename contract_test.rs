@@ -14,6 +14,53 @@ fn mint_works() {
 }
 
 #[test]
+fn mint_batch_works() {
+    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    contract.mint_batch(1, vec![0, 1, 2], vec![1, 2, 3]); // to, token, amount
+    assert_eq!(contract.balance_of(1, 0), 1); // who, token
+    assert_eq!(contract.balance_of(1, 1), 2); // who, token
+    assert_eq!(contract.balance_of(1, 2), 3); // who, token
+
+    contract.mint_batch(1, vec![0, 1, 2], vec![1, 2, 3]);
+    assert_eq!(contract.balance_of(1, 0), 2); // who, token
+    assert_eq!(contract.balance_of(1, 1), 4); // who, token
+    assert_eq!(contract.balance_of(1, 2), 6); // who, token
+}
+
+#[test]
+fn balance_of_works() {
+    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    assert_eq!(contract.balance_of(1, 2), 0); // who, token
+
+    contract.mint(1, 2, 3); // to, token, amount
+    assert_eq!(contract.balance_of(1, 2), 3); // who, token
+
+    contract.mint(1, 2, 3);
+    assert_eq!(contract.balance_of(1, 2), 6);
+}
+
+#[test]
+fn balance_of_batch_works() {
+    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    assert_eq!(
+        contract.balance_of_batch(vec![1, 1, 1], vec![0, 1, 2]),
+        vec![0, 0, 0]
+    ); // who, token
+
+    contract.mint_batch(1, vec![0, 1, 2], vec![1, 2, 3]); // to, token, amount
+    assert_eq!(
+        contract.balance_of_batch(vec![1, 1, 1], vec![0, 1, 2]),
+        vec![1, 2, 3]
+    ); // who, token
+
+    contract.mint_batch(1, vec![0, 1, 2], vec![1, 2, 3]); // to, token, amount
+    assert_eq!(
+        contract.balance_of_batch(vec![1, 1, 1], vec![0, 1, 2]),
+        vec![2, 4, 6]
+    ); // who, token
+}
+
+#[test]
 fn transfer_works() {
     let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
     contract.mint(1, 2, 3); // to, token, amount

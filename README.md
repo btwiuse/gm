@@ -55,17 +55,27 @@ features:
 
 - support any combination of fungible and non-fungible tokens;
   - see [IERC1155](./lib.rs) trait and [implementation](./contract.rs)
+  - this interface is kept as small as possible to make the code moduler.
+  - mint, burn and other safety check methods are specified in IERC1155Ext,
+    IERC1155Check, ...
+  - implementation caveat: `safe_*` methods are actually not safe if they are
+    invoked before IERC1155Check methods.
 - able to transfer, mint or burn several tokens at once;
   - see [IERC1155Ext](./lib.rs) trait and [implementation](./contract.rs)
 - emit events when transactions succeed
   - see [IERC1155GearExt](./lib.rs) trait and [implementation](./contract.rs)
+  - events are always emitted after the transaction is made
+- abort transaction early when the requirement isn't met
+  - see [IERC1155Check](./lib.rs) trait and [implementation](./contract.rs)
+  - checks are always performed before the transaction is made
 - approval management and token metadata.
   - see [ITokenMetadataRegistry](./lib.rs) trait and
     [implementation](./contract.rs)
-  - the token metadata manager works similar to Metaplex Token Metadata program
-    on Solana. It manages token metadata for both fungible and non fungible
-    tokens. The token metadata is empty by default and is set separately after
-    mint using the `update_token_metadata` method
+  - the token metadata manager is a simple KV store that works similar to
+    Metaplex Token Metadata program on Solana. It manages token metadata for
+    both fungible and non fungible tokens. The token metadata is empty by
+    default and is supposed to be set manually after mint using the
+    `update_token_metadata` method
 - basic contract ownership management, access control.
   - see [IOwnable](./lib.rs) trait and [implementation](./contract.rs)
 
@@ -76,11 +86,10 @@ TODO:
 - [x] Support contract state query
 - [x] Emit events using `msg::reply`
 - [x] Add basic tests for `contract.rs`, `init.rs`, `query.rs`, `handle.rs`
-- [x] implement ERC1155 batch operations
-- [ ] Perform sanity checks on user input in `mint`, `mint_batch`,
-      `safe_transfer_from`, `safe_batch_transfer_from`, etc. before any state
-      mutation. Currently implementation doesn't handle untrusted input very
-      well.
+- [x] implement IERC1155 batch operations
+- [x] implement IERC1155Check: perform sanity checks on user input before
+      invoking `mint`, `mint_batch`, `safe_transfer_from`,
+      `safe_batch_transfer_from`, etc. before any state mutation.
 - [ ] Comprehensive testing covering all possible bad cases. Currently there are
       only a few good cases
 - [ ] Submit result
