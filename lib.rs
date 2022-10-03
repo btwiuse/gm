@@ -5,18 +5,22 @@
 #![no_std]
 
 use gstd::{debug, msg, prelude::*, ActorId};
-use primitive_types::U256;
 
 pub mod codec;
 pub mod config;
 pub mod contract;
+pub mod handle;
 pub mod init;
 pub mod metadata;
 pub mod query;
 pub mod state;
-pub mod transaction;
 
-pub use crate::codec::{Event, Init, Input, Output, Query, State};
+mod contract_test;
+mod handle_test;
+mod init_test;
+mod query_test;
+
+pub use crate::codec::{Event, Init, InitOk, Input, Query, State, TokenMetadata};
 pub use config::{GearConfig, TestConfig};
 pub use contract::Contract;
 pub use state::STATE;
@@ -26,53 +30,6 @@ pub use state::STATE;
 pub trait IOwnable<T: IConfig> {
     fn owner(&self) -> T::AccountId;
     fn is_owner(&self, who: &T::AccountId) -> bool;
-}
-
-/// Ledger interface definition
-pub trait ILedger<T: IConfig> {
-    fn balance_of(&self, who: &T::AccountId) -> T::AccountBalance;
-    fn balance_incr(&mut self, who: &T::AccountId);
-}
-
-/// ERC20 interface definition
-// https://github.com/paritytech/ink/blob/master/examples/erc20/lib.rs
-// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
-pub trait IERC20<T: IConfig> {
-    fn symbol(&self) -> T::Text;
-    fn name(&self) -> T::Text;
-    fn decimals(&self) -> T::TokenDecimal;
-    fn total_issuance(&self) -> T::AccountBalance;
-    fn balance_of(&self, who: &T::AccountId) -> T::AccountBalance;
-    fn transfer(&mut self, to: &T::AccountId, amount: T::AccountBalance);
-    fn transfer_from(&mut self, from: &T::AccountId, to: &T::AccountId, amount: T::AccountBalance);
-    fn allowance(&self, owner: &T::AccountId, spender: &T::AccountId) -> T::AccountBalance;
-    fn emit_transfer_event(from: &T::AccountId, to: &T::AccountId, amount: &T::AccountBalance);
-    fn emit_approval_event(
-        owner: &T::AccountId,
-        spender: &T::AccountId,
-        amount: &T::AccountBalance,
-    );
-    fn burn(&mut self);
-    fn mint(&mut self);
-}
-
-/// ERC721 interface definition
-// https://eips.ethereum.org/EIPS/eip-721
-pub trait IERC721<T: IConfig> {
-    fn symbol(&self) -> T::Text;
-    fn name(&self) -> T::Text;
-    fn decimals(&self) -> T::TokenDecimal;
-    fn total_issuance(&self) -> T::AccountBalance;
-    fn balance_of(&self, who: &T::AccountId) -> T::AccountBalance;
-    fn owner_of(&self, token: &T::TokenId) -> T::AccountId;
-    fn safe_transfer_from(&mut self, from: &T::AccountId, to: &T::AccountId, token: &T::TokenId);
-    fn transfer_from(&mut self, from: &T::AccountId, to: &T::AccountId, token: &T::TokenId);
-    fn approve(&self, who: &T::AccountId, token: &T::TokenId);
-    fn get_approved(&self, token: &T::TokenId) -> T::AccountId;
-    fn emit_transfer_event(from: &T::AccountId, to: &T::AccountId, token: &T::TokenId);
-    fn emit_approval_event(owner: &T::AccountId, spender: &T::AccountId, token: &T::TokenId);
-    fn burn(&mut self, token: &T::TokenId);
-    fn mint(&mut self, to: &T::AccountId, token: &T::TokenId);
 }
 
 /// ERC1155 interface gear extension
@@ -99,14 +56,6 @@ pub trait IERC1155GearExt {
 
 /// ERC1155 interface extension
 pub trait IERC1155Ext<T: IConfig> {
-    // fn decimals(&self) -> T::TokenDecimal;
-    // fn total_issuance(&self) -> T::AccountBalance;
-    /// fn approve(&self, who: &T::AccountId, token: &T::TokenId);
-    // fn get_approved(&self, token: &T::TokenId) -> T::AccountId;
-    // fn emit_transfer_single_event( &self, operator: &T::AccountId, from: &T::AccountId, to: &T::AccountId, token: &T::TokenId, amount: &T::AccountBalance,);
-    // fn emit_transfer_batch_event( operator: &T::AccountId, from: &T::AccountId, to: &T::AccountId, token: &[T::TokenId], amount: &[T::AccountBalance],);
-    // fn emit_approval_for_all_event(owner: &T::AccountId, spender: &T::AccountId, approved: bool);
-    // fn emit_uri_event(value: &T::Text, token: &T::TokenId);
     fn name(&self) -> T::Text;
     fn symbol(&self) -> T::Text;
     fn burn(&mut self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance);
@@ -129,6 +78,11 @@ pub trait IERC1155Ext<T: IConfig> {
 // https://eips.ethereum.org/EIPS/eip-1155#metadata
 pub trait IERC1155MetadataURI<T: IConfig> {
     fn uri(&self, token: T::TokenId) -> T::Text;
+}
+
+pub trait ITokenMetadataRegistry<T: IConfig> {
+    fn get_token_metadata(&self, token: T::TokenId) -> Option<TokenMetadata>;
+    fn update_token_metadata(&mut self, token: T::TokenId, metadata: Option<TokenMetadata>);
 }
 
 /// ERC1155 interface definition
@@ -156,17 +110,8 @@ pub trait IERC1155<T: IConfig> {
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
     );
-    /*
-    fn transfer_from(
-        &mut self,
-        from: &T::AccountId,
-        to: &T::AccountId,
-        token: &T::TokenId,
-        amount: &T::AccountBalance,
-    );
-    */
-    fn set_approval_for_all(&mut self, operator: T::AccountId, approved: bool);
-    fn is_approved_for_all(&mut self, owner: T::AccountId, operator: T::AccountId) -> bool;
+    fn set_approval_for_all(&mut self, owner: T::AccountId, operator: T::AccountId, approved: bool);
+    fn is_approved_for_all(&self, owner: T::AccountId, operator: T::AccountId) -> bool;
 }
 
 /// configuration trait that abstracts contract implementation from concrete types
@@ -179,12 +124,12 @@ pub trait IConfig {
 }
 
 /// token id trait alias
-pub trait ITokenId = Eq + Copy + Clone + core::hash::Hash + Ord;
+pub trait ITokenId = Eq + Copy + Clone + core::hash::Hash + Ord + fmt::Debug;
 
 /// account id trait alias
 ///
 /// a method for returning the zero address is required.
-pub trait IAccountId = zero::IZero + Eq + Copy + Clone + core::hash::Hash + Ord;
+pub trait IAccountId = zero::IZero + Eq + Copy + Clone + core::hash::Hash + Ord + fmt::Debug;
 
 /// account balance trait alias
 ///
@@ -193,7 +138,10 @@ pub trait IAccountBalance = num_traits::Zero
     + num_traits::One
     + num_traits::CheckedAdd
     + num_traits::CheckedSub
+    + num_traits::SaturatingAdd
+    + num_traits::SaturatingSub
     + num_traits::sign::Unsigned
+    + fmt::Debug
     + Copy
     + Clone
     + Default
@@ -207,7 +155,10 @@ pub trait ITokenDecimal = num_traits::Zero
     + num_traits::One
     + num_traits::CheckedAdd
     + num_traits::CheckedSub
+    + num_traits::SaturatingAdd
+    + num_traits::SaturatingSub
     + num_traits::sign::Unsigned
+    + fmt::Debug
     + Copy
     + Clone
     + Default;
@@ -215,7 +166,7 @@ pub trait ITokenDecimal = num_traits::Zero
 /// text trait
 ///
 /// default value should be an empty string
-pub trait IText: From<String> + ToString + Clone {
+pub trait IText: From<String> + ToString + Clone + fmt::Debug {
     fn default() -> Self;
 }
 
@@ -247,7 +198,7 @@ mod zero {
             0u8
         }
         fn is_zero(&self) -> bool {
-            *self == IZero::zero()
+            *self == 0u8
         }
     }
 }

@@ -4,16 +4,17 @@ use crate::*;
 
 /// Contract struct
 pub struct Contract<T: IConfig> {
-    pub balances: BTreeMap<T::AccountId, T::AccountBalance>,
     pub owner: T::AccountId,
     pub total_issuance: T::AccountBalance,
     pub name: T::Text,
     pub symbol: T::Text,
     pub decimals: T::TokenDecimal,
     // https://eips.ethereum.org/EIPS/eip-1046
-    pub token_uri: T::Text,
-    pub allowances: BTreeMap<T::AccountId, BTreeMap<T::AccountId, T::AccountBalance>>,
+    // pub token_uri: T::Text,
     pub base_uri: T::Text,
+    pub metadata_registry: BTreeMap<T::TokenId, TokenMetadata>,
+    pub balances: BTreeMap<T::TokenId, BTreeMap<T::AccountId, T::AccountBalance>>,
+    pub approvals: BTreeMap<T::AccountId, BTreeMap<T::AccountId, bool>>,
 }
 
 /// constructor method
@@ -34,12 +35,12 @@ impl<T: IConfig> Default for Contract<T> {
             symbol: T::Text::default(),
             total_issuance: T::AccountBalance::default(),
             decimals: T::TokenDecimal::default(),
-            token_uri: T::Text::default(),
-            balances: BTreeMap::<T::AccountId, T::AccountBalance>::default(),
-            allowances:
-                BTreeMap::<T::AccountId, BTreeMap<T::AccountId, T::AccountBalance>>::default(),
+            // token_uri: T::Text::default(),
             owner: T::AccountId::zero(),
             base_uri: T::Text::default(),
+            metadata_registry: BTreeMap::<T::TokenId, TokenMetadata>::default(),
+            balances: BTreeMap::<T::TokenId, BTreeMap<T::AccountId, T::AccountBalance>>::default(),
+            approvals: BTreeMap::<T::AccountId, BTreeMap<T::AccountId, bool>>::default(),
         }
     }
 }
@@ -64,103 +65,30 @@ impl<T: IConfig> IOwnable<T> for Option<Contract<T>> {
     }
 }
 
-mod ignore {
-    /*
-        use super::*;
-        /// Ledger interface
-        impl<T: IConfig> ILedger<T> for Contract<T> {
-            fn balance_incr(&mut self, who: &T::AccountId) {
-                use num_traits::CheckedAdd;
-                use num_traits::One;
-                let balance = ILedger::balance_of(self, &who);
-                if let Some(balance_plus_one) = balance.checked_add(&T::AccountBalance::one()) {
-                    self.balances.insert(*who, balance_plus_one);
-                }
-            }
-            fn balance_of(&self, who: &T::AccountId) -> T::AccountBalance {
-                self.balances.get(&who).copied().unwrap_or_default()
-            }
-        }
-
-        /// Ledger interface
-        impl<T: IConfig> ILedger<T> for Option<Contract<T>> {
-            fn balance_incr(&mut self, who: &T::AccountId) {
-                self.as_mut().unwrap().balance_incr(who)
-            }
-            fn balance_of(&self, who: &T::AccountId) -> T::AccountBalance {
-                ILedger::balance_of(self.as_ref().unwrap(), who)
-            }
-        }
-
-        /// ERC20 interface
-        impl<T: IConfig> IERC20<T> for Contract<T> {
-            fn symbol(&self) -> T::Text {
-                self.symbol.clone()
-            }
-            fn name(&self) -> T::Text {
-                self.name.clone()
-            }
-            // fn token_uri(&self) -> T::Text { self.token_uri }
-            fn decimals(&self) -> T::TokenDecimal {
-                self.decimals
-            }
-            fn total_issuance(&self) -> T::AccountBalance {
-                self.total_issuance
-            }
-            fn burn(&mut self) {
-                todo!()
-            }
-            fn mint(&mut self) {
-                todo!()
-            }
-            fn balance_of(&self, who: &T::AccountId) -> T::AccountBalance {
-                self.balances.get(&who).copied().unwrap_or_default()
-            }
-            fn allowance(&self, owner: &T::AccountId, spender: &T::AccountId) -> T::AccountBalance {
-                self.allowances
-                    .get(&owner)
-                    .cloned()
-                    .unwrap_or_default()
-                    .get(&spender)
-                    .copied()
-                    .unwrap_or_default()
-            }
-            fn transfer(&mut self, to: &T::AccountId, amount: T::AccountBalance) {
-                todo!()
-            }
-            fn transfer_from(
-                &mut self,
-                from: &T::AccountId,
-                to: &T::AccountId,
-                amount: T::AccountBalance,
-            ) {
-                todo!()
-            }
-            fn emit_transfer_event(from: &T::AccountId, to: &T::AccountId, amount: &T::AccountBalance) {
-                todo!()
-            }
-            fn emit_approval_event(
-                owner: &T::AccountId,
-                spender: &T::AccountId,
-                amount: &T::AccountBalance,
-            ) {
-                todo!()
-            }
-        }
-    */
-}
-
 /// ERC1155 interface
 impl<T: IConfig> IERC1155<T> for Contract<T> {
     fn balance_of(&self, who: T::AccountId, token: T::TokenId) -> T::AccountBalance {
-        todo!()
+        self.balances
+            .get(&token)
+            .cloned()
+            .unwrap_or_default()
+            .get(&who)
+            .cloned()
+            .unwrap_or_default()
     }
     fn balance_of_batch(
         &self,
         who: Vec<T::AccountId>,
         token: Vec<T::TokenId>,
     ) -> Vec<T::AccountBalance> {
-        todo!()
+        if who.len() != token.len() {
+            panic!("Error: length of accounts and tokens mismatch")
+        }
+        token
+            .iter()
+            .zip(who)
+            .map(|(token, account)| self.balance_of(account, *token))
+            .collect()
     }
     fn safe_transfer_from(
         &mut self,
@@ -169,7 +97,25 @@ impl<T: IConfig> IERC1155<T> for Contract<T> {
         token: T::TokenId,
         amount: T::AccountBalance,
     ) {
-        todo!()
+        self.balances.entry(token).and_modify(|kv| {
+            kv.entry(from)
+                .and_modify(|v| *v = v.saturating_sub(&amount));
+            kv.entry(to)
+                .and_modify(|v| *v = v.saturating_add(&amount))
+                .or_insert(amount);
+        });
+
+        /*
+        self.balances.entry(token).and_modify(|kv| {
+            kv.entry(to)
+                .and_modify(|v| *v = v.saturating_add(&amount))
+                .or_insert(amount);
+        }).or_insert({
+            let mut btm = BTreeMap::new();
+            btm.insert(to, amount);
+            btm
+        });
+        */
     }
     fn safe_batch_transfer_from(
         &mut self,
@@ -178,24 +124,29 @@ impl<T: IConfig> IERC1155<T> for Contract<T> {
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
     ) {
-        todo!()
+        token
+            .iter()
+            .enumerate()
+            .for_each(|(i, tk)| self.safe_transfer_from(from, to, *tk, amount[i]))
     }
-    /*
-    fn transfer_from(
+    fn set_approval_for_all(
         &mut self,
-        from: &T::AccountId,
-        to: &T::AccountId,
-        token: &T::TokenId,
-        amount: &T::AccountBalance,
+        owner: T::AccountId,
+        operator: T::AccountId,
+        approved: bool,
     ) {
-        todo!()
+        self.approvals.entry(owner).and_modify(|kv| {
+            kv.entry(operator).and_modify(|v| *v = approved);
+        });
     }
-    */
-    fn set_approval_for_all(&mut self, operator: T::AccountId, approved: bool) {
-        todo!()
-    }
-    fn is_approved_for_all(&mut self, owner: T::AccountId, operator: T::AccountId) -> bool {
-        todo!()
+    fn is_approved_for_all(&self, owner: T::AccountId, operator: T::AccountId) -> bool {
+        self.approvals
+            .get(&owner)
+            .cloned()
+            .unwrap_or_default()
+            .get(&operator)
+            .cloned()
+            .unwrap_or_default()
     }
 }
 
@@ -209,13 +160,16 @@ impl<T: IConfig> IERC1155MetadataURI<T> for Contract<T> {
 /// ERC1155Ext interface
 impl<T: IConfig> IERC1155Ext<T> for Contract<T> {
     fn name(&self) -> T::Text {
-        todo!()
+        self.name.clone()
     }
     fn symbol(&self) -> T::Text {
-        todo!()
+        self.symbol.clone()
     }
     fn burn(&mut self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance) {
-        todo!()
+        self.balances.entry(token).and_modify(|kv| {
+            kv.entry(from)
+                .and_modify(|v| *v = v.saturating_sub(&amount));
+        });
     }
     fn burn_batch(
         &mut self,
@@ -223,10 +177,25 @@ impl<T: IConfig> IERC1155Ext<T> for Contract<T> {
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
     ) {
-        todo!()
+        token
+            .iter()
+            .enumerate()
+            .for_each(|(i, tk)| self.burn(from, *tk, amount[i]))
     }
     fn mint(&mut self, to: T::AccountId, token: T::TokenId, amount: T::AccountBalance) {
-        todo!()
+        // debug!("minting {:?} {:?} {:?}", to, token, amount);
+        self.balances
+            .entry(token)
+            .and_modify(|kv| {
+                kv.entry(to)
+                    .and_modify(|v| *v = v.saturating_add(&amount))
+                    .or_insert(amount);
+            })
+            .or_insert({
+                let mut btm = BTreeMap::new();
+                btm.insert(to, amount);
+                btm
+            });
     }
     fn mint_batch(
         &mut self,
@@ -234,55 +203,29 @@ impl<T: IConfig> IERC1155Ext<T> for Contract<T> {
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
     ) {
-        todo!()
+        token
+            .iter()
+            .enumerate()
+            .for_each(|(i, tk)| self.mint(to, *tk, amount[i]))
     }
 }
-/*
-/// ERC1155Ext interface
-impl<T: IConfig> IERC1155Ext<T> for Option<Contract<T>> {
-    fn name(&self) -> T::Text {
-        // self.as_ref().unwrap().name()
-        // IERC1155Ext::name(&self.as_ref().unwrap())
-        todo!()
+
+/// ITokenMetadataRegistry interface
+impl<T: IConfig> ITokenMetadataRegistry<T> for Contract<T> {
+    fn get_token_metadata(&self, token: T::TokenId) -> Option<TokenMetadata> {
+        self.metadata_registry.get(&token).cloned()
     }
-    fn symbol(&self) -> T::Text {
-        // self.as_ref().unwrap().symbol()
-        // IERC1155Ext::symbol(&self.as_ref().unwrap())
-        todo!()
-    }
-    fn emit_transfer_single_event(
-        &self,
-        operator: &T::AccountId,
-        from: &T::AccountId,
-        to: &T::AccountId,
-        token: &T::TokenId,
-        amount: &T::AccountBalance,
-    ) {
-        todo!()
-    }
-    fn emit_transfer_batch_event(
-        operator: &T::AccountId,
-        from: &T::AccountId,
-        to: &T::AccountId,
-        token: &[T::TokenId],
-        amount: &[T::AccountBalance],
-    ) {
-        todo!()
-    }
-    fn emit_approval_for_all_event(owner: &T::AccountId, spender: &T::AccountId, approved: bool) {
-        todo!()
-    }
-    fn emit_uri_event(value: &T::Text, token: &T::TokenId) {
-        todo!()
-    }
-    fn burn(&mut self, from: &T::AccountId, token: &T::TokenId, amount: &T::AccountBalance) {
-        todo!()
-    }
-    fn mint(&mut self, to: &T::AccountId, token: &T::TokenId, amount: &T::AccountBalance) {
-        todo!()
+    fn update_token_metadata(&mut self, token: T::TokenId, metadata: Option<TokenMetadata>) {
+        match metadata {
+            Some(m) => {
+                self.metadata_registry.insert(token, m);
+            }
+            None => {
+                self.metadata_registry.remove_entry(&token);
+            }
+        }
     }
 }
-*/
 
 /// ERC1155Ext interface
 impl IERC1155GearExt for Contract<GearConfig> {
@@ -294,16 +237,17 @@ impl IERC1155GearExt for Contract<GearConfig> {
         token: u128,
         amount: u128,
     ) {
-        /*
-        msg::reply(Event::TransferSingle{
-            operator: *operator,
-            from: *from,
-            to: *to,
-            token: *token,
-            amount: *amount,
-        }, 0).expect("Failed to reply Event::TransferSingle");
-        */
-        todo!()
+        msg::reply(
+            Event::TransferSingle {
+                operator,
+                from,
+                to,
+                token,
+                amount,
+            },
+            0,
+        )
+        .expect("Failed to reply Event::TransferSingle");
     }
     fn emit_transfer_batch_event(
         &self,
@@ -313,64 +257,30 @@ impl IERC1155GearExt for Contract<GearConfig> {
         token: Vec<u128>,
         amount: Vec<u128>,
     ) {
-        todo!()
+        msg::reply(
+            Event::TransferBatch {
+                operator,
+                from,
+                to,
+                token,
+                amount,
+            },
+            0,
+        )
+        .expect("Failed to reply Event::TransferBatch");
     }
-    fn emit_approval_for_all_event(&self, owner: ActorId, spender: ActorId, approved: bool) {
-        todo!()
+    fn emit_approval_for_all_event(&self, owner: ActorId, operator: ActorId, approved: bool) {
+        msg::reply(
+            Event::ApprovalForAll {
+                owner,
+                operator,
+                approved,
+            },
+            0,
+        )
+        .expect("Failed to reply Event::ApprovalForAll");
     }
     fn emit_uri_event(&self, value: String, token: u128) {
-        todo!()
+        msg::reply(Event::URI { value, token }, 0).expect("Failed to reply Event::URI");
     }
 }
-
-/*
-/// ERC1155Ext interface
-impl<T: IConfig> IERC1155Ext<T> for Contract<T> {
-    fn name(&self) -> T::Text {
-        self.name.clone()
-    }
-    fn symbol(&self) -> T::Text {
-        self.symbol.clone()
-    }
-    fn emit_transfer_single_event(
-        &self,
-        operator: &T::AccountId,
-        from: &T::AccountId,
-        to: &T::AccountId,
-        token: &T::TokenId,
-        amount: &T::AccountBalance,
-    ) {
-        /*
-        msg::reply(Event::TransferSingle{
-            operator: *operator,
-            from: *from,
-            to: *to,
-            token: *token,
-            amount: *amount,
-        }, 0).expect("Failed to reply Event::TransferSingle");
-        */
-        todo!()
-    }
-    fn emit_transfer_batch_event(
-        operator: &T::AccountId,
-        from: &T::AccountId,
-        to: &T::AccountId,
-        token: &[T::TokenId],
-        amount: &[T::AccountBalance],
-    ) {
-        todo!()
-    }
-    fn emit_approval_for_all_event(owner: &T::AccountId, spender: &T::AccountId, approved: bool) {
-        todo!()
-    }
-    fn emit_uri_event(value: &T::Text, token: &T::TokenId) {
-        todo!()
-    }
-    fn burn(&mut self, from: &T::AccountId, token: &T::TokenId, amount: &T::AccountBalance) {
-        todo!()
-    }
-    fn mint(&mut self, to: &T::AccountId, token: &T::TokenId, amount: &T::AccountBalance) {
-        todo!()
-    }
-}
-*/

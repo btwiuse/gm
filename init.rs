@@ -23,4 +23,5 @@ pub unsafe extern "C" fn init() {
     STATE.as_mut().unwrap().name = name;
     STATE.as_mut().unwrap().symbol = symbol;
     STATE.as_mut().unwrap().base_uri = base_uri;
+    msg::reply(InitOk, 0).expect("Failed to reply");
 }

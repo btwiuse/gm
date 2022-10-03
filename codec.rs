@@ -7,30 +7,21 @@ use ::scale_info::TypeInfo;
 /// contract I/O types for initialization
 pub mod init {
     use super::*;
-    #[derive(Debug, TypeInfo, Encode, Decode)]
+    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Clone)]
     pub struct Init {
         pub name: String,
         pub symbol: String,
         pub base_uri: String,
     }
+    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Clone)]
+    pub struct InitOk;
 }
 
-/// contract I/O types for transactions
+/// contract I/O types for transactions and events
 pub mod transaction {
     use super::*;
-    #[derive(Debug, TypeInfo, Decode, Encode)]
+    #[derive(Debug, TypeInfo, Decode, Encode, PartialEq, Clone)]
     pub enum Input {
-        // Payload(String),
-        /*
-        BalanceOf {
-            who: ActorId,
-            token: u128,
-        },
-        BalanceOfBatch {
-            who: Vec<ActorId>,
-            token: Vec<u128>,
-        },
-        */
         TransferFrom {
             from: ActorId,
             to: ActorId,
@@ -70,61 +61,9 @@ pub mod transaction {
         UpdateTokenMetadata {
             token: u128,
             metadata: Option<TokenMetadata>,
-        }
+        },
     }
-
-    #[derive(Debug, TypeInfo, Encode, Decode)]
-    pub enum Output {
-        Payload(ActorId),
-    }
-}
-
-/// contract I/O types for state queries
-pub mod query {
-    use super::*;
-    #[derive(Debug, TypeInfo, Decode, Encode)]
-    pub enum Query {
-        Name,
-        Symbol,
-        BaseUri,
-        BalanceOf(ActorId, u128),
-        BalanceOfBatch(Vec<ActorId>, Vec<u128>),
-        /*
-        Metadata(TokenId),
-        TokensForOwner(ActorId),
-        TokensIDsForOwner(ActorId),
-        Supply(TokenId),
-        OwnerOf(TokenId),
-        */
-        IsApprovedForAll { who: ActorId, operator: bool },
-        TokenMetadata(u128),
-    }
-
-    #[derive(Debug, TypeInfo, Encode, Decode)]
-    pub enum State {
-        // AccountId(ActorId),
-        Name(String),
-        Symbol(String),
-        BaseUri(String),
-        BalanceOf(ActorId, u128, u128),
-        BalanceOfBatch(Vec<ActorId>, Vec<u128>, Vec<u128>),
-        /*
-        Balance(ActorId),
-        URI(String),
-        Metadata(TokenMetadata),
-        Tokens(Vec<>),
-        Supply(Vec<>),
-        OwnerOf(Vec<>),
-        */
-        IsApprovedForAll(bool),
-        TokenMetadata(u128, Option<TokenMetadata>)
-    }
-}
-
-/// contract I/O types for events
-pub mod event {
-    use super::*;
-    #[derive(Debug, TypeInfo, Encode, Decode)]
+    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Clone)]
     pub enum Event {
         TransferSingle {
             operator: ActorId,
@@ -141,15 +80,45 @@ pub mod event {
             amount: Vec<u128>,
         },
         ApprovalForAll {
-            who: ActorId,
+            owner: ActorId,
             operator: ActorId,
             approved: bool,
+        },
+        URI {
+            value: String,
+            token: u128,
         },
     }
 }
 
+/// contract I/O types for state queries and replies
+pub mod query {
+    use super::*;
+    #[derive(Debug, TypeInfo, Decode, Encode, PartialEq, Clone)]
+    pub enum Query {
+        Name,
+        Symbol,
+        BaseUri,
+        BalanceOf(ActorId, u128),
+        BalanceOfBatch(Vec<ActorId>, Vec<u128>),
+        IsApprovedForAll { owner: ActorId, operator: ActorId },
+        TokenMetadata(u128),
+    }
+
+    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Clone)]
+    pub enum State {
+        Name(String),
+        Symbol(String),
+        BaseUri(String),
+        BalanceOf(u128),
+        BalanceOfBatch(Vec<u128>),
+        IsApprovedForAll(bool),
+        TokenMetadata(Option<TokenMetadata>),
+    }
+}
+
 /// token metadata
-#[derive(Debug, TypeInfo, Encode, Decode)]
+#[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Clone)]
 pub struct TokenMetadata {
     pub name: String,
     pub description: String,
@@ -157,7 +126,6 @@ pub struct TokenMetadata {
     pub json_uri: String,
 }
 
-pub use self::event::*;
 pub use self::init::*;
 pub use self::query::*;
 pub use self::transaction::*;

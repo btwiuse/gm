@@ -5,22 +5,27 @@ use crate::*;
 #[no_mangle]
 unsafe extern "C" fn meta_state() -> *mut [i32; 2] {
     let query: Query = msg::load().expect("failed to decode input argument");
-    let id: ActorId = msg::source();
-    // PAYLOADS.push(input);
-    // let id = STATE.last().unwrap_or(&id);
-    let state = STATE.as_ref().unwrap();
+    let state = STATE.as_ref().expect("failed to get contract state");
     let encoded = match query {
-        /*
-        Query::Last => State::AccountId(*id).encode(),
-        Query::All => State::All(STATE.clone()).encode(),
-        */
-        Query::Name => State::Name(state.name.clone()),
-        Query::Symbol => State::Symbol(state.symbol.clone()),
+        Query::Name => State::Name(state.name()),
+        Query::Symbol => State::Symbol(state.symbol()),
         Query::BaseUri => State::BaseUri(state.base_uri.clone()),
-        Query::TokenMetadata(token) => State::TokenMetadata(0, None),
-        Query::IsApprovedForAll { who, operator } => State::IsApprovedForAll(true),
-        Query::BalanceOf(who, token) => State::BalanceOf(who, token.clone(), token),
-        Query::BalanceOfBatch(who, token) => State::BalanceOfBatch(who, token.clone(), token),
+        Query::TokenMetadata(token) => {
+            let metadata = state.get_token_metadata(token);
+            State::TokenMetadata(metadata)
+        }
+        Query::IsApprovedForAll { owner, operator } => {
+            let approved = state.is_approved_for_all(owner, operator);
+            State::IsApprovedForAll(approved)
+        }
+        Query::BalanceOf(who, token) => {
+            let balance = state.balance_of(who, token);
+            State::BalanceOf(balance)
+        }
+        Query::BalanceOfBatch(who, token) => {
+            let balance = state.balance_of_batch(who, token);
+            State::BalanceOfBatch(balance)
+        }
     }
     .encode();
     gstd::util::to_leak_ptr(encoded)

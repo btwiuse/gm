@@ -6,9 +6,10 @@ gstd::metadata! {
     title: "gm",
     init:
         input: Init,
+        output: InitOk,
     handle:
         input: Input,
-        output: Output,
+        output: Event,
     state:
         input: Query,
         output: State,
