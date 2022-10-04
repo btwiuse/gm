@@ -27,9 +27,9 @@ Directory layout:
 .
 ├── lib.rs            // High level abstractions and trait definitions: IERC1155, IERC1155GearExt, ITokenMetadataRegistry, ...
 ├── codec.rs          // Encoder and Decoder types for contract IO: initialization, transaction input, events, state query, token metadata
-├── config.rs         // Provides implementations to IConfig for standard and testing environment: GearConfig, TestConfig
+├── config.rs         // Provides implementations to IConfig for standard and testing environment: GearConfig, MockConfig
 ├── contract.rs       // Contract<T: IConfig> implements IERC1155, IERC1155GearExt, ITokenMetadataRegistry, ...
-├── contract_test.rs  // contract core logic related tests, using TestConfig, without explicit dependency on gstd, gtest
+├── contract_test.rs  // contract core logic related tests, using MockConfig, without explicit dependency on gstd, gtest
 
 ├── state.rs          // pub static mut STATE: Option<Contract<GearConfig>>
 ├── metadata.rs       // gstd::metadata!
@@ -77,7 +77,8 @@ features:
     both fungible and non fungible tokens. The token metadata is empty by
     default and is supposed to be set manually after mint using the
     `update_token_metadata` method
-  - in this implementation, both token owner and approved user are allowed to update token metadata.
+  - in this implementation, all token owners are allowed to update token
+    metadata.
 
 TODO:
 
@@ -91,9 +92,11 @@ TODO:
       invoking `mint`, `mint_batch`, `safe_transfer_from`,
       `safe_batch_transfer_from`, etc. before any state mutation.
 - [x] add methods for obtaining caller info in IConfig
-- [x] refactor IERC1155 to make IERC1155Check a requirement: `pub trait IERC1155<T: IConfig>: IERC1155Check<T>`
+- [x] refactor IERC1155 to make IERC1155Check a requirement:
+      `pub trait IERC1155<T: IConfig>: IERC1155Check<T>`
 - [ ] Comprehensive testing covering all possible bad cases. Currently there are
-      only a few good cases (Help wanted: what is the preferred way to handle panic cases in `handle.rs`?)
+      only a few good cases (Help wanted: what is the preferred way to handle
+      panic cases in `handle.rs`?)
 - [ ] Submit result
 
 <!-- End of description -->

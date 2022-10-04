@@ -21,7 +21,7 @@ mod init_test;
 mod query_test;
 
 pub use crate::codec::{Event, Init, InitOk, Input, Query, State, TokenMetadata};
-pub use config::{GearConfig, TestConfig};
+pub use config::{GearConfig, MockConfig};
 pub use contract::Contract;
 pub use state::STATE;
 
@@ -35,40 +35,45 @@ pub trait IOwnable<T: IConfig> {
 /// ERC1155 interface check extension
 pub trait IERC1155Check<T: IConfig> {
     fn check_transfer_from(
-        &mut self,
+        &self,
         from: T::AccountId,
         to: T::AccountId,
         token: T::TokenId,
         amount: T::AccountBalance,
     );
     fn check_batch_transfer_from(
-        &mut self,
+        &self,
         from: T::AccountId,
         to: T::AccountId,
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
     );
-    fn check_mint(&mut self, to: T::AccountId, token: T::TokenId, amount: T::AccountBalance);
+    fn check_balance_of_batch(
+        &self,
+        who: Vec<T::AccountId>,
+        token: Vec<T::TokenId>,
+    );
+    fn check_mint(&self, to: T::AccountId, token: T::TokenId, amount: T::AccountBalance);
     fn check_mint_batch(
-        &mut self,
+        &self,
         to: T::AccountId,
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
     );
     fn check_set_approval_for_all(
-        &mut self,
+        &self,
         owner: T::AccountId,
         operator: T::AccountId,
         approved: bool,
     );
-    fn check_burn(&mut self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance);
+    fn check_burn(&self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance);
     fn check_burn_batch(
-        &mut self,
+        &self,
         from: T::AccountId,
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
     );
-    fn check_update_token_metadata(&mut self, token: T::TokenId, metadata: Option<TokenMetadata>);
+    fn check_update_token_metadata(&self, token: T::TokenId, metadata: Option<TokenMetadata>);
 }
 
 /// ERC1155 interface gear extension

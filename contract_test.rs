@@ -5,7 +5,7 @@ use crate::*;
 #[cfg(test)]
 #[test]
 fn mint_works() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(1, 1);
     contract.mint(1, 2, 3); // to, token, amount
     assert_eq!(contract.balance_of(1, 2), 3); // who, token
@@ -14,7 +14,7 @@ fn mint_works() {
 #[test]
 #[should_panic]
 fn mint_twice_panics() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(1, 1);
     contract.mint(1, 2, 3); // to, token, amount
     contract.mint(1, 2, 3);
@@ -23,7 +23,7 @@ fn mint_twice_panics() {
 
 #[test]
 fn mint_batch_works() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(1, 1);
     contract.mint_batch(1, vec![0, 1, 2], vec![1, 2, 3]); // to, token, amount
     assert_eq!(contract.balance_of(1, 0), 1); // who, token
@@ -34,7 +34,7 @@ fn mint_batch_works() {
 #[test]
 #[should_panic]
 fn mint_batch_twice_panics() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(1, 1);
     contract.mint_batch(1, vec![0, 1, 2], vec![1, 2, 3]); // to, token, amount
     contract.mint_batch(1, vec![0, 1, 2], vec![1, 2, 3]);
@@ -43,7 +43,7 @@ fn mint_batch_twice_panics() {
 
 #[test]
 fn balance_of_works() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(1, 1);
 
     assert_eq!(contract.balance_of(1, 2), 0); // who, token
@@ -54,7 +54,7 @@ fn balance_of_works() {
 
 #[test]
 fn balance_of_batch_works() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(1, 1);
 
     assert_eq!(
@@ -71,7 +71,7 @@ fn balance_of_batch_works() {
 
 #[test]
 fn transfer_works() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(1, 1);
     contract.mint(1, 2, 3); // to, token, amount
 
@@ -82,7 +82,7 @@ fn transfer_works() {
 
 #[test]
 fn transfer_batch_works() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(1, 1);
     contract.mint_batch(1, vec![0, 1, 2], vec![3, 4, 5]); // to, token, amount
 
@@ -98,7 +98,7 @@ fn transfer_batch_works() {
 #[test]
 #[should_panic]
 fn transfer_exceeding_balance_panics() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(1, 1);
     contract.mint(1, 0, 3); // to, token, amount
 
@@ -109,7 +109,7 @@ fn transfer_exceeding_balance_panics() {
 #[test]
 #[should_panic]
 fn transfer_batch_exceeding_balance_panics() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(1, 1);
     contract.mint_batch(1, vec![0, 1, 2], vec![3, 4, 5]); // to, token, amount
 
@@ -119,7 +119,7 @@ fn transfer_batch_exceeding_balance_panics() {
 
 #[test]
 fn burn_works() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(1, 1);
     contract.mint(1, 2, 3); // to, token, amount
 
@@ -129,7 +129,7 @@ fn burn_works() {
 
 #[test]
 fn default_approval_for_all_is_false() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(1, 1);
     contract.mint(1, 2, 3); // to, token, amount
 
@@ -140,14 +140,14 @@ fn default_approval_for_all_is_false() {
 #[test]
 #[should_panic]
 fn set_approval_for_all_from_non_owner_panics() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(42, 42);
     contract.set_approval_for_all(1, 42, true); // owner, operator
 }
 
 #[test]
 fn set_approval_for_all_from_origin_works() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(0, 1);
 
     contract.set_approval_for_all(1, 42, true); // owner, operator
@@ -161,7 +161,7 @@ fn set_approval_for_all_from_origin_works() {
 
 #[test]
 fn set_approval_for_all_from_sender_works() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(1, 0);
 
     contract.set_approval_for_all(1, 42, true); // owner, operator
@@ -175,7 +175,7 @@ fn set_approval_for_all_from_sender_works() {
 
 #[test]
 fn set_approval_for_all_works() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(1, 1);
     contract.mint(1, 2, 3); // to, token, amount
 
@@ -191,7 +191,7 @@ fn set_approval_for_all_works() {
 
 #[test]
 fn default_token_metadata_is_none() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(1, 1);
     contract.mint(1, 2, 3); // to, token, amount
 
@@ -201,7 +201,7 @@ fn default_token_metadata_is_none() {
 
 #[test]
 fn update_token_metadata_works() {
-    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(1, 1);
     contract.mint(1, 2, 3); // to, token, amount
 

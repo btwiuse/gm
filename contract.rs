@@ -70,102 +70,111 @@ impl<T: IConfig> IOwnable<T> for Option<Contract<T>> {
 /// ERC1155Check interface
 impl<T: IConfig> IERC1155Check<T> for Contract<T> {
     fn check_transfer_from(
-        &mut self,
+        &self,
         from: T::AccountId,
         to: T::AccountId,
         token: T::TokenId,
         amount: T::AccountBalance,
     ) {
-        let (signer, origin) = (self.sender(), self.origin());
-        if from != signer && from != origin && !self.is_approved_for_all(from, signer) {
-            panic!("permission denied")
+        if from != self.sender() {
+            if !self.is_approved_for_all(from, self.sender()) {
+                panic!("check failed: needs approval")
+            }
         }
         if self.balance_of(from, token) < amount {
-            panic!("insufficient balance")
+            panic!("check failed: insufficient balance")
         }
         if from == to {
-            panic!("self transfer not permitted")
+            panic!("check failed: self transfer not permitted")
         }
         if to.is_zero() {
-            panic!("transfer to black hole not permitted")
+            panic!("check failed: transfer to black hole not permitted")
         }
     }
     fn check_batch_transfer_from(
-        &mut self,
+        &self,
         from: T::AccountId,
         to: T::AccountId,
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
     ) {
         if token.len() != amount.len() {
-            panic!("token and amount length mismatch")
+            panic!("check failed: token and amount length mismatch")
         }
         for (tk, am) in token.iter().zip(amount.clone()) {
             self.check_transfer_from(from, to, *tk, am)
         }
     }
-    fn check_mint(&mut self, to: T::AccountId, token: T::TokenId, amount: T::AccountBalance) {
+    fn check_mint(&self, to: T::AccountId, token: T::TokenId, amount: T::AccountBalance) {
         if to.is_zero() {
-            panic!("cannot mint to black hole address")
+            panic!("check failed: cannot mint to black hole address")
         }
         if amount.is_zero() {
-            panic!("cannot mint 0 amount")
+            panic!("check failed: cannot mint 0 amount")
         }
         if self.balances.get(&token).is_some() {
-            panic!("cannot mint twice")
+            panic!("check failed: cannot mint twice")
         }
     }
     fn check_mint_batch(
-        &mut self,
+        &self,
         to: T::AccountId,
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
     ) {
         if token.len() != amount.len() {
-            panic!("token and amount length mismatch")
+            panic!("check failed: token and amount length mismatch")
         }
         for (tk, am) in token.iter().zip(amount.clone()) {
             self.check_mint(to, *tk, am)
         }
     }
+    fn check_balance_of_batch(
+        &self,
+        who: Vec<T::AccountId>,
+        token: Vec<T::TokenId>,
+    ) {
+        if who.len() != token.len() {
+            panic!("check failed: token and account length mismatch")
+        }
+    }
     fn check_set_approval_for_all(
-        &mut self,
+        &self,
         owner: T::AccountId,
         _operator: T::AccountId,
         _approved: bool,
     ) {
-        if self.sender() != owner && self.origin() != owner {
-            panic!("permission denied")
+        if owner != self.sender() {
+            panic!("check failed: sender is not account owner")
         }
     }
-    fn check_burn(&mut self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance) {
-        if self.sender() != from && self.origin() != from {
+    fn check_burn(&self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance) {
+        if from != self.sender() {
             if !self.is_approved_for_all(from, self.sender()) {
-                panic!("needs approval")
+                panic!("check failed: needs approval")
             }
         }
         if self.balance_of(from, token) < amount {
-            panic!("insufficient balance")
+            panic!("check failed: insufficient balance")
         }
     }
     fn check_burn_batch(
-        &mut self,
+        &self,
         from: T::AccountId,
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
     ) {
         if token.len() != amount.len() {
-            panic!("token and amount length mismatch")
+            panic!("check failed: token and amount length mismatch")
         }
         for (tk, am) in token.iter().zip(amount.clone()) {
             self.check_burn(from, *tk, am)
         }
     }
     // allow owner of token to update metadata
-    fn check_update_token_metadata(&mut self, token: T::TokenId, _metadata: Option<TokenMetadata>) {
-        let (signer, origin) = (self.sender(), self.origin());
-        if self.balance_of(signer, token).is_zero() || self.balance_of(origin, token).is_zero() {
-            panic!("no permission")
+    fn check_update_token_metadata(&self, token: T::TokenId, _metadata: Option<TokenMetadata>) {
+        if self.balance_of(self.sender(), token).is_zero() {
+            panic!("check failed: needs approval")
         }
     }
 }
@@ -186,9 +195,7 @@ impl<T: IConfig> IERC1155<T> for Contract<T> {
         who: Vec<T::AccountId>,
         token: Vec<T::TokenId>,
     ) -> Vec<T::AccountBalance> {
-        if who.len() != token.len() {
-            panic!("Error: length of accounts and tokens mismatch")
-        }
+        self.check_balance_of_batch(who.clone(), token.clone());
         token
             .iter()
             .zip(who)
@@ -203,9 +210,6 @@ impl<T: IConfig> IERC1155<T> for Contract<T> {
         amount: T::AccountBalance,
     ) {
         self.check_transfer_from(from, to, token, amount);
-        if self.balance_of(from, token) < amount {
-            panic!("Error: insufficient balance")
-        }
         self.balances.entry(token).and_modify(|kv| {
             kv.entry(from)
                 .and_modify(|v| *v = v.saturating_sub(&amount));

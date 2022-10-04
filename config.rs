@@ -1,8 +1,8 @@
 //! contract associated types configuration
 //!
-//! GearConfig is used in formal code. For testing purpose, TestConfig is preferred.
+//! GearConfig is used in formal code. For testing purpose, MockConfig is preferred.
 //!
-//! In TestConfig, the account id type is set to u8 in order to simplify writing account id literals in tests
+//! In MockConfig, the account id type is set to u8 in order to simplify writing account id literals in tests
 //!
 //! see contract_test.rs
 
@@ -28,12 +28,12 @@ impl IConfig for GearConfig {
 
 /// GearConfig implements IConfig for testing environment
 #[derive(Default, Clone, Copy, PartialOrd, Eq, PartialEq)]
-pub struct TestConfig {
+pub struct MockConfig {
     pub origin: u8,
     pub sender: u8,
 }
 
-impl TestConfig {
+impl MockConfig {
     pub fn set_sender(&mut self, sender: u8) {
         self.sender = sender;
     }
@@ -46,7 +46,7 @@ impl TestConfig {
     }
 }
 
-impl IConfig for TestConfig {
+impl IConfig for MockConfig {
     type AccountId = u8;
     type AccountBalance = u32;
     type TokenDecimal = u8;
