@@ -6,7 +6,6 @@ use crate::*;
 pub struct Contract<T: IConfig> {
     pub env: T,
     pub owner: T::AccountId,
-    // pub total_issuance: T::AccountBalance,
     pub name: T::Text,
     pub symbol: T::Text,
     pub base_uri: T::Text,
@@ -36,7 +35,6 @@ impl<T: IConfig> Default for Contract<T> {
         Self {
             env: T::default(),
             owner: T::AccountId::zero(),
-            // total_issuance: T::AccountBalance::default(),
             name: T::Text::default(),
             symbol: T::Text::default(),
             base_uri: T::Text::default(),
@@ -44,26 +42,6 @@ impl<T: IConfig> Default for Contract<T> {
             approvals: BTreeMap::<T::AccountId, BTreeMap<T::AccountId, bool>>::default(),
             metadata_registry: BTreeMap::<T::TokenId, TokenMetadata>::default(),
         }
-    }
-}
-
-/// IOwnable interface
-impl<T: IConfig> IOwnable<T> for Contract<T> {
-    fn owner(&self) -> T::AccountId {
-        self.owner.clone()
-    }
-    fn is_owner(&self, who: &T::AccountId) -> bool {
-        *who == self.owner
-    }
-}
-
-/// IOwnable interface
-impl<T: IConfig> IOwnable<T> for Option<Contract<T>> {
-    fn owner(&self) -> T::AccountId {
-        self.as_ref().unwrap().owner()
-    }
-    fn is_owner(&self, who: &T::AccountId) -> bool {
-        self.as_ref().unwrap().is_owner(who)
     }
 }
 
@@ -129,11 +107,7 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
             self.check_mint(to, *tk, am)
         }
     }
-    fn check_balance_of_batch(
-        &self,
-        who: Vec<T::AccountId>,
-        token: Vec<T::TokenId>,
-    ) {
+    fn check_balance_of_batch(&self, who: Vec<T::AccountId>, token: Vec<T::TokenId>) {
         if who.len() != token.len() {
             panic!("check failed: token and account length mismatch")
         }
@@ -296,7 +270,6 @@ impl<T: IConfig> IERC1155Ext<T> for Contract<T> {
     }
     fn mint(&mut self, to: T::AccountId, token: T::TokenId, amount: T::AccountBalance) {
         self.check_mint(to, token, amount);
-        // debug!("minting {:?} {:?} {:?}", to, token, amount);
         self.balances
             .entry(token)
             .and_modify(|kv| {

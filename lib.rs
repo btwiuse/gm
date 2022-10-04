@@ -25,13 +25,6 @@ pub use config::{GearConfig, MockConfig};
 pub use contract::Contract;
 pub use state::STATE;
 
-/// Ownable interface definition
-// https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
-pub trait IOwnable<T: IConfig> {
-    fn owner(&self) -> T::AccountId;
-    fn is_owner(&self, who: &T::AccountId) -> bool;
-}
-
 /// ERC1155 interface check extension
 pub trait IERC1155Check<T: IConfig> {
     fn check_transfer_from(
@@ -48,11 +41,7 @@ pub trait IERC1155Check<T: IConfig> {
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
     );
-    fn check_balance_of_batch(
-        &self,
-        who: Vec<T::AccountId>,
-        token: Vec<T::TokenId>,
-    );
+    fn check_balance_of_batch(&self, who: Vec<T::AccountId>, token: Vec<T::TokenId>);
     fn check_mint(&self, to: T::AccountId, token: T::TokenId, amount: T::AccountBalance);
     fn check_mint_batch(
         &self,

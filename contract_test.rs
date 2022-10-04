@@ -146,20 +146,6 @@ fn set_approval_for_all_from_non_owner_panics() {
 }
 
 #[test]
-fn set_approval_for_all_from_origin_works() {
-    let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
-    contract.env.set_sender_origin(0, 1);
-
-    contract.set_approval_for_all(1, 42, true); // owner, operator
-    let approved = contract.is_approved_for_all(1, 42); // owner, operator
-    assert_eq!(approved, true);
-
-    contract.set_approval_for_all(1, 42, false); // owner, operator
-    let approved = contract.is_approved_for_all(1, 42); // owner, operator
-    assert_eq!(approved, false);
-}
-
-#[test]
 fn set_approval_for_all_from_sender_works() {
     let mut contract: Contract<MockConfig> = Contract::<MockConfig>::default();
     contract.env.set_sender_origin(1, 0);
