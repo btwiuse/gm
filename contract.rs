@@ -155,13 +155,11 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
 /// ERC1155 interface
 impl<T: IConfig> IERC1155<T> for Contract<T> {
     fn balance_of(&self, who: T::AccountId, token: T::TokenId) -> T::AccountBalance {
-        self.balances
+        *self
+            .balances
             .get(&token)
-            .cloned()
-            .unwrap_or_default()
-            .get(&who)
-            .cloned()
-            .unwrap_or_default()
+            .and_then(|kv| kv.get(&who))
+            .unwrap_or(&T::AccountBalance::zero())
     }
     fn balance_of_batch(
         &self,
@@ -223,13 +221,11 @@ impl<T: IConfig> IERC1155<T> for Contract<T> {
             });
     }
     fn is_approved_for_all(&self, owner: T::AccountId, operator: T::AccountId) -> bool {
-        self.approvals
+        *self
+            .approvals
             .get(&owner)
-            .cloned()
-            .unwrap_or_default()
-            .get(&operator)
-            .cloned()
-            .unwrap_or_default()
+            .and_then(|kv| kv.get(&operator))
+            .unwrap_or(&false)
     }
 }
 
