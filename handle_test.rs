@@ -19,7 +19,7 @@ fn mint_works() {
     };
     let _res = program.send(42, init_msg);
 
-    let mint_msg = Input::Mint {
+    let mint_msg = Action::Mint {
         to: ActorId::from(42),
         token: 0,
         amount: 1,
@@ -53,7 +53,7 @@ fn mint_twice_panics() {
     };
     let _res = program.send(42, init_msg);
 
-    let mint_msg = Input::Mint {
+    let mint_msg = Action::Mint {
         to: ActorId::from(42),
         token: 0,
         amount: 1,
@@ -84,7 +84,7 @@ fn mint_batch_works() {
     };
     let _res = program.send(42, init_msg);
 
-    let mint_msg = Input::MintBatch {
+    let mint_msg = Action::MintBatch {
         to: ActorId::from(42),
         token: vec![0, 1, 2, 3],
         amount: vec![1, 2, 3, 4],
@@ -114,7 +114,7 @@ fn burn_empty_panics() {
 
     let _res = program.send(
         42,
-        Input::Burn {
+        Action::Burn {
             from: ActorId::from(42),
             token: 0,
             amount: 1,
@@ -134,7 +134,7 @@ fn burn_works() {
 
     program.send(
         42,
-        Input::Mint {
+        Action::Mint {
             to: ActorId::from(42),
             token: 0,
             amount: 1,
@@ -143,7 +143,7 @@ fn burn_works() {
 
     let res = program.send(
         42,
-        Input::Burn {
+        Action::Burn {
             from: ActorId::from(42),
             token: 0,
             amount: 1,
@@ -173,7 +173,7 @@ fn update_token_metadata_works() {
 
     program.send(
         42,
-        Input::Mint {
+        Action::Mint {
             to: ActorId::from(42),
             token: 0,
             amount: 1,
@@ -189,7 +189,7 @@ fn update_token_metadata_works() {
 
     let res = program.send(
         42,
-        Input::UpdateTokenMetadata {
+        Action::UpdateTokenMetadata {
             token: 0,
             metadata: some_metadata.clone(),
         },

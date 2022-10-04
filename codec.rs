@@ -21,7 +21,7 @@ pub mod init {
 pub mod transaction {
     use super::*;
     #[derive(Debug, TypeInfo, Decode, Encode, PartialEq, Eq, Clone)]
-    pub enum Input {
+    pub enum Action {
         TransferFrom {
             from: ActorId,
             to: ActorId,

@@ -20,7 +20,7 @@ mod handle_test;
 mod init_test;
 mod query_test;
 
-pub use crate::codec::{Event, Init, InitOk, Input, Query, State, TokenMetadata};
+pub use crate::codec::{Action, Event, Init, InitOk, Query, State, TokenMetadata};
 pub use config::{GearConfig, MockConfig};
 pub use contract::Contract;
 pub use state::STATE;

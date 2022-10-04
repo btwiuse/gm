@@ -6,9 +6,9 @@ use crate::*;
 unsafe extern "C" fn handle() {
     let sender: ActorId = gstd::msg::source();
     let state = STATE.as_mut().expect("Could not get state");
-    let input: Input = gstd::msg::load().expect("Could not load msg");
-    match input {
-        Input::TransferFrom {
+    let action: Action = gstd::msg::load().expect("Could not load msg");
+    match action {
+        Action::TransferFrom {
             from,
             to,
             token,
@@ -17,7 +17,7 @@ unsafe extern "C" fn handle() {
             state.safe_transfer_from(from, to, token, amount);
             state.emit_transfer_single_event(sender, from, to, token, amount);
         }
-        Input::BatchTransferFrom {
+        Action::BatchTransferFrom {
             from,
             to,
             token,
@@ -26,19 +26,19 @@ unsafe extern "C" fn handle() {
             state.safe_batch_transfer_from(from, to, token.clone(), amount.clone());
             state.emit_transfer_batch_event(sender, from, to, token, amount);
         }
-        Input::SetApprovalForAll { operator, approved } => {
+        Action::SetApprovalForAll { operator, approved } => {
             state.set_approval_for_all(sender, operator, approved);
             state.emit_approval_for_all_event(sender, operator, approved);
         }
-        Input::Mint { to, token, amount } => {
+        Action::Mint { to, token, amount } => {
             state.mint(to, token, amount);
             state.emit_transfer_single_event(sender, ActorId::zero(), to, token, amount);
         }
-        Input::MintBatch { to, token, amount } => {
+        Action::MintBatch { to, token, amount } => {
             state.mint_batch(to, token.clone(), amount.clone());
             state.emit_transfer_batch_event(sender, ActorId::zero(), to, token, amount);
         }
-        Input::Burn {
+        Action::Burn {
             from,
             token,
             amount,
@@ -46,7 +46,7 @@ unsafe extern "C" fn handle() {
             state.burn(from, token, amount);
             state.emit_transfer_single_event(sender, from, ActorId::zero(), token, amount);
         }
-        Input::BurnBatch {
+        Action::BurnBatch {
             from,
             token,
             amount,
@@ -54,10 +54,10 @@ unsafe extern "C" fn handle() {
             state.burn_batch(from, token.clone(), amount.clone());
             state.emit_transfer_batch_event(sender, from, ActorId::zero(), token, amount);
         }
-        Input::UpdateTokenMetadata { token, metadata } => {
+        Action::UpdateTokenMetadata { token, metadata } => {
             state.update_token_metadata(token, metadata.clone());
             state.emit_update_token_metadata_event(token, metadata);
         }
-        Input::Whoami => state.emit_whoami_event(),
+        Action::Whoami => state.emit_whoami_event(),
     }
 }

@@ -8,7 +8,7 @@ gstd::metadata! {
         input: Init,
         output: InitOk,
     handle:
-        input: Input,
+        input: Action,
         output: Event,
     state:
         input: Query,
