@@ -88,7 +88,7 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
         if amount.is_zero() {
             panic!("check failed: cannot mint 0 amount")
         }
-        if self.balances.get(&token).is_some() {
+        if self.balances.contains_key(&token) {
             panic!("check failed: cannot mint twice")
         }
     }
@@ -143,7 +143,7 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
     }
     // allow owner of token to update metadata
     fn check_update_token_metadata(&self, token: T::TokenId, _metadata: Option<TokenMetadata>) {
-        if self.balances.get(&token).is_none() {
+        if !self.balances.contains_key(&token) {
             panic!("check failed: no such token")
         }
         if self.balance_of(self.sender(), token).is_zero() {
