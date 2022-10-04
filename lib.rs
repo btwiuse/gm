@@ -85,6 +85,8 @@ pub trait IERC1155GearExt {
     );
     fn emit_approval_for_all_event(&self, owner: ActorId, spender: ActorId, approved: bool);
     fn emit_uri_event(&self, value: String, token: u128);
+    /// whoami is a utility method for emitting an event containing sender and origin of the current tx
+    fn emit_whoami_event(&self);
 }
 
 /// ERC1155 interface extension

@@ -313,6 +313,16 @@ impl<T: IConfig> ITokenMetadataRegistry<T> for Contract<T> {
 
 /// ERC1155GearExt interface
 impl IERC1155GearExt for Contract<GearConfig> {
+    fn emit_whoami_event(&self) {
+        gstd::msg::reply(
+            Event::Whoami {
+                sender: self.sender(),
+                origin: self.origin(),
+            },
+            0,
+        )
+        .expect("Failed to reply Event::Whoami");
+    }
     fn emit_transfer_single_event(
         &self,
         operator: ActorId,

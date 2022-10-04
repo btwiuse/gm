@@ -60,7 +60,8 @@ fn mint_twice_panics() {
     };
 
     program.send(42, mint_msg.clone());
-    program.send(42, mint_msg); // should panic
+    // should panic:
+    program.send(42, mint_msg);
 
     // TODO how to assert panic in tests?
     // panic!("this line shouldn't appear in cargo test result");
@@ -98,6 +99,65 @@ fn mint_batch_works() {
     };
 
     let res = program.send(42, mint_msg);
+    assert_eq!(res.log().len(), 1);
+    assert_eq!(res.log()[0].payload(), expected.encode());
+}
+
+#[test]
+fn burn_empty_panics() {
+    let system = System::new();
+    system.init_logger();
+
+    let program = Program::current(&system);
+
+    program.send(42, Init::default());
+
+    let _res = program.send(
+        42,
+        Input::Burn {
+            from: ActorId::from(42),
+            token: 0,
+            amount: 1,
+        },
+    );
+    // assert!(res.log().is_empty());
+}
+
+#[test]
+fn burn_works() {
+    let system = System::new();
+    system.init_logger();
+
+    let program = Program::current(&system);
+
+    program.send(42, Init::default());
+
+    program.send(
+        42,
+        Input::Mint {
+            to: ActorId::from(42),
+            token: 0,
+            amount: 1,
+        },
+    );
+
+    let res = program.send(
+        42,
+        Input::Burn {
+            from: ActorId::from(42),
+            token: 0,
+            amount: 1,
+        },
+    );
+
+    let expected = Event::TransferSingle {
+        operator: ActorId::from(42),
+        from: ActorId::from(42),
+        to: ActorId::zero(),
+        token: 0,
+        amount: 1,
+    };
+
     assert_eq!(res.log().len(), 1);
     assert_eq!(res.log()[0].payload(), expected.encode());
 }

@@ -172,7 +172,7 @@ fn set_approval_for_all_works() {
 
     contract.set_approval_for_all(1, 42, false); // owner, operator
     let approved = contract.is_approved_for_all(1, 42); // owner, operator
-    assert!(approved);
+    assert!(!approved);
 }
 
 #[test]

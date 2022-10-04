@@ -57,5 +57,6 @@ unsafe extern "C" fn handle() {
         Input::UpdateTokenMetadata { token, metadata } => {
             state.update_token_metadata(token, metadata);
         }
+        Input::Whoami => state.emit_whoami_event(),
     }
 }

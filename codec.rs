@@ -7,13 +7,13 @@ use ::scale_info::TypeInfo;
 /// contract I/O types for initialization
 pub mod init {
     use super::*;
-    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone)]
+    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone, Default)]
     pub struct Init {
         pub name: String,
         pub symbol: String,
         pub base_uri: String,
     }
-    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone)]
+    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone, Default)]
     pub struct InitOk;
 }
 
@@ -62,6 +62,7 @@ pub mod transaction {
             token: u128,
             metadata: Option<TokenMetadata>,
         },
+        Whoami,
     }
     #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone)]
     pub enum Event {
@@ -87,6 +88,10 @@ pub mod transaction {
         URI {
             value: String,
             token: u128,
+        },
+        Whoami {
+            sender: ActorId,
+            origin: ActorId,
         },
     }
 }
@@ -118,7 +123,7 @@ pub mod query {
 }
 
 /// token metadata
-#[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone)]
+#[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone, Default)]
 pub struct TokenMetadata {
     pub name: String,
     pub description: String,
