@@ -7,20 +7,20 @@ use ::scale_info::TypeInfo;
 /// contract I/O types for initialization
 pub mod init {
     use super::*;
-    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Clone)]
+    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone)]
     pub struct Init {
         pub name: String,
         pub symbol: String,
         pub base_uri: String,
     }
-    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Clone)]
+    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone)]
     pub struct InitOk;
 }
 
 /// contract I/O types for transactions and events
 pub mod transaction {
     use super::*;
-    #[derive(Debug, TypeInfo, Decode, Encode, PartialEq, Clone)]
+    #[derive(Debug, TypeInfo, Decode, Encode, PartialEq, Eq, Clone)]
     pub enum Input {
         TransferFrom {
             from: ActorId,
@@ -63,7 +63,7 @@ pub mod transaction {
             metadata: Option<TokenMetadata>,
         },
     }
-    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Clone)]
+    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone)]
     pub enum Event {
         TransferSingle {
             operator: ActorId,
@@ -94,7 +94,7 @@ pub mod transaction {
 /// contract I/O types for state queries and replies
 pub mod query {
     use super::*;
-    #[derive(Debug, TypeInfo, Decode, Encode, PartialEq, Clone)]
+    #[derive(Debug, TypeInfo, Decode, Encode, PartialEq, Eq, Clone)]
     pub enum Query {
         Name,
         Symbol,
@@ -105,7 +105,7 @@ pub mod query {
         TokenMetadata(u128),
     }
 
-    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Clone)]
+    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone)]
     pub enum State {
         Name(String),
         Symbol(String),
@@ -118,7 +118,7 @@ pub mod query {
 }
 
 /// token metadata
-#[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Clone)]
+#[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone)]
 pub struct TokenMetadata {
     pub name: String,
     pub description: String,

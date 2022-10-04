@@ -33,7 +33,7 @@ fn mint_works() {
         amount: 1,
     };
 
-    let res = program.send(42, mint_msg.clone());
+    let res = program.send(42, mint_msg);
     assert_eq!(res.log().len(), 1);
     assert_eq!(res.log()[0].payload(), expected.encode());
 }
@@ -60,12 +60,13 @@ fn mint_twice_panics() {
     };
 
     program.send(42, mint_msg.clone());
-    program.send(42, mint_msg.clone()); // should panic
-                                        // TODO how to assert panic in tests?
-                                        // panic!("this line shouldn't appear in cargo test result");
-                                        //
-                                        // TODO why this panics?
-                                        // debug!("this line shouldn't appear in cargo test result");
+    program.send(42, mint_msg); // should panic
+
+    // TODO how to assert panic in tests?
+    // panic!("this line shouldn't appear in cargo test result");
+    //
+    // TODO why this panics?
+    // debug!("this line shouldn't appear in cargo test result");
 }
 
 #[test]
@@ -96,7 +97,7 @@ fn mint_batch_works() {
         amount: vec![1, 2, 3, 4],
     };
 
-    let res = program.send(42, mint_msg.clone());
+    let res = program.send(42, mint_msg);
     assert_eq!(res.log().len(), 1);
     assert_eq!(res.log()[0].payload(), expected.encode());
 }

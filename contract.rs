@@ -54,10 +54,8 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
         token: T::TokenId,
         amount: T::AccountBalance,
     ) {
-        if from != self.sender() {
-            if !self.is_approved_for_all(from, self.sender()) {
-                panic!("check failed: needs approval")
-            }
+        if from != self.sender() && !self.is_approved_for_all(from, self.sender()) {
+            panic!("check failed: needs approval")
         }
         if self.balance_of(from, token) < amount {
             panic!("check failed: insufficient balance")
@@ -79,7 +77,7 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
         if token.len() != amount.len() {
             panic!("check failed: token and amount length mismatch")
         }
-        for (tk, am) in token.iter().zip(amount.clone()) {
+        for (tk, am) in token.iter().zip(amount) {
             self.check_transfer_from(from, to, *tk, am)
         }
     }
@@ -103,7 +101,7 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
         if token.len() != amount.len() {
             panic!("check failed: token and amount length mismatch")
         }
-        for (tk, am) in token.iter().zip(amount.clone()) {
+        for (tk, am) in token.iter().zip(amount) {
             self.check_mint(to, *tk, am)
         }
     }
@@ -123,10 +121,8 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
         }
     }
     fn check_burn(&self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance) {
-        if from != self.sender() {
-            if !self.is_approved_for_all(from, self.sender()) {
-                panic!("check failed: needs approval")
-            }
+        if from != self.sender() && !self.is_approved_for_all(from, self.sender()) {
+            panic!("check failed: needs approval")
         }
         if self.balance_of(from, token) < amount {
             panic!("check failed: insufficient balance")
@@ -141,7 +137,7 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
         if token.len() != amount.len() {
             panic!("check failed: token and amount length mismatch")
         }
-        for (tk, am) in token.iter().zip(amount.clone()) {
+        for (tk, am) in token.iter().zip(amount) {
             self.check_burn(from, *tk, am)
         }
     }

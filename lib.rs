@@ -210,7 +210,7 @@ pub trait IText: From<String> + ToString + Clone + fmt::Debug {
 
 impl IText for String {
     fn default() -> Self {
-        return String::from("");
+        String::from("")
     }
 }
 
