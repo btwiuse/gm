@@ -163,7 +163,7 @@ pub trait IConfig: Default {
     type TokenDecimal: ITokenDecimal;
     type TokenId: ITokenId;
     fn origin(&self) -> Self::AccountId;
-    fn source(&self) -> Self::AccountId;
+    fn sender(&self) -> Self::AccountId;
 }
 
 /// token id trait alias

@@ -21,27 +21,27 @@ impl IConfig for GearConfig {
     fn origin(&self) -> Self::AccountId {
         gstd::exec::origin()
     }
-    fn source(&self) -> Self::AccountId {
+    fn sender(&self) -> Self::AccountId {
         gstd::msg::source()
     }
 }
 
 /// GearConfig implements IConfig for testing environment
-#[derive(Default, Clone, Copy)]
+#[derive(Default, Clone, Copy, PartialOrd, Eq, PartialEq)]
 pub struct TestConfig {
     pub origin: u8,
-    pub source: u8,
+    pub sender: u8,
 }
 
 impl TestConfig {
-    fn set_source(&mut self, source: u8) {
-        self.source = source;
+    pub fn set_sender(&mut self, sender: u8) {
+        self.sender = sender;
     }
-    fn set_origin(&mut self, origin: u8) {
+    pub fn set_origin(&mut self, origin: u8) {
         self.origin = origin;
     }
-    pub fn set_source_origin(&mut self, source: u8, origin: u8) {
-        self.set_source(source);
+    pub fn set_sender_origin(&mut self, sender: u8, origin: u8) {
+        self.set_sender(sender);
         self.set_origin(origin);
     }
 }
@@ -55,7 +55,7 @@ impl IConfig for TestConfig {
     fn origin(&self) -> Self::AccountId {
         self.origin
     }
-    fn source(&self) -> Self::AccountId {
-        self.source
+    fn sender(&self) -> Self::AccountId {
+        self.sender
     }
 }

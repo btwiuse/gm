@@ -23,8 +23,8 @@ impl<T: IConfig> Contract<T> {
             ..Self::default()
         }
     }
-    pub fn source(&self) -> T::AccountId {
-        self.env.source()
+    pub fn sender(&self) -> T::AccountId {
+        self.env.sender()
     }
     pub fn origin(&self) -> T::AccountId {
         self.env.origin()
@@ -76,7 +76,7 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
         token: T::TokenId,
         amount: T::AccountBalance,
     ) {
-        let (signer, origin) = (self.source(), self.origin());
+        let (signer, origin) = (self.sender(), self.origin());
         if from != signer && from != origin && !self.is_approved_for_all(from, signer) {
             panic!("permission denied")
         }
@@ -134,13 +134,13 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
         _operator: T::AccountId,
         _approved: bool,
     ) {
-        if self.source() != owner && self.origin() != owner {
+        if self.sender() != owner && self.origin() != owner {
             panic!("permission denied")
         }
     }
     fn check_burn(&mut self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance) {
-        if self.source() != from && self.origin() != from {
-            if !self.is_approved_for_all(from, self.source()) {
+        if self.sender() != from && self.origin() != from {
+            if !self.is_approved_for_all(from, self.sender()) {
                 panic!("needs approval")
             }
         }
@@ -163,7 +163,7 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
     }
     // allow owner of token to update metadata
     fn check_update_token_metadata(&mut self, token: T::TokenId, _metadata: Option<TokenMetadata>) {
-        let (signer, origin) = (self.source(), self.origin());
+        let (signer, origin) = (self.sender(), self.origin());
         if self.balance_of(signer, token).is_zero() || self.balance_of(origin, token).is_zero() {
             panic!("no permission")
         }
