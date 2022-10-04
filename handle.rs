@@ -55,7 +55,8 @@ unsafe extern "C" fn handle() {
             state.emit_transfer_batch_event(sender, from, ActorId::zero(), token, amount);
         }
         Input::UpdateTokenMetadata { token, metadata } => {
-            state.update_token_metadata(token, metadata);
+            state.update_token_metadata(token, metadata.clone());
+            state.emit_update_token_metadata_event(token, metadata);
         }
         Input::Whoami => state.emit_whoami_event(),
     }

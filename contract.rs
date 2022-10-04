@@ -143,8 +143,11 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
     }
     // allow owner of token to update metadata
     fn check_update_token_metadata(&self, token: T::TokenId, _metadata: Option<TokenMetadata>) {
+        if self.balances.get(&token).is_none() {
+            panic!("check failed: no such token")
+        }
         if self.balance_of(self.sender(), token).is_zero() {
-            panic!("check failed: needs approval")
+            panic!("check failed: not token owner")
         }
     }
 }
@@ -313,6 +316,10 @@ impl<T: IConfig> ITokenMetadataRegistry<T> for Contract<T> {
 
 /// ERC1155GearExt interface
 impl IERC1155GearExt for Contract<GearConfig> {
+    fn emit_update_token_metadata_event(&self, token: u128, metadata: Option<TokenMetadata>) {
+        gstd::msg::reply(Event::UpdateTokenMetadata { token, metadata }, 0)
+            .expect("Failed to reply Event::UpdateTokenMetadata");
+    }
     fn emit_whoami_event(&self) {
         gstd::msg::reply(
             Event::Whoami {

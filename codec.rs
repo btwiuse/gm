@@ -89,6 +89,10 @@ pub mod transaction {
             value: String,
             token: u128,
         },
+        UpdateTokenMetadata {
+            token: u128,
+            metadata: Option<TokenMetadata>,
+        },
         Whoami {
             sender: ActorId,
             origin: ActorId,

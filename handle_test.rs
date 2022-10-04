@@ -161,3 +161,45 @@ fn burn_works() {
     assert_eq!(res.log().len(), 1);
     assert_eq!(res.log()[0].payload(), expected.encode());
 }
+
+#[test]
+fn update_token_metadata_works() {
+    let system = System::new();
+    system.init_logger();
+
+    let program = Program::current(&system);
+
+    program.send(42, Init::default());
+
+    program.send(
+        42,
+        Input::Mint {
+            to: ActorId::from(42),
+            token: 0,
+            amount: 1,
+        },
+    );
+
+    let some_metadata = Some(TokenMetadata {
+        name: "nft".to_string(),
+        description: "nft for test".to_string(),
+        image_uri: "https://gm.dev/nft.png".to_string(),
+        json_uri: "https://gm.dev/nft.json".to_string(),
+    });
+
+    let res = program.send(
+        42,
+        Input::UpdateTokenMetadata {
+            token: 0,
+            metadata: some_metadata.clone(),
+        },
+    );
+
+    let expected = Event::UpdateTokenMetadata {
+        token: 0,
+        metadata: some_metadata,
+    };
+
+    assert_eq!(res.log().len(), 1);
+    assert_eq!(res.log()[0].payload(), expected.encode());
+}
