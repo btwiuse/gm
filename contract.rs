@@ -217,6 +217,9 @@ impl<T: IConfig> IERC1155<T> for Contract<T> {
         token: T::TokenId,
         amount: T::AccountBalance,
     ) {
+        if self.balance_of(from, token) < amount {
+            panic!("Error: insufficient balance")
+        }
         self.balances.entry(token).and_modify(|kv| {
             kv.entry(from)
                 .and_modify(|v| *v = v.saturating_sub(&amount));

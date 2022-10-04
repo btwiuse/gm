@@ -71,6 +71,40 @@ fn transfer_works() {
 }
 
 #[test]
+fn transfer_batch_works() {
+    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    contract.mint_batch(1, vec![0,1,2], vec![3,4,5]); // to, token, amount
+
+    contract.safe_batch_transfer_from(1, 42, vec![0,1,2], vec![3,2,1]); // from, to, token, amount
+    assert_eq!(contract.balance_of(1, 0), 0);
+    assert_eq!(contract.balance_of(1, 1), 2);
+    assert_eq!(contract.balance_of(1, 2), 4);
+    assert_eq!(contract.balance_of(42, 0), 3);
+    assert_eq!(contract.balance_of(42, 1), 2);
+    assert_eq!(contract.balance_of(42, 2), 1);
+}
+
+#[test]
+#[should_panic]
+fn transfer_exceeding_balance_panics() {
+    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    contract.mint(1, 0, 3); // to, token, amount
+
+    contract.safe_transfer_from(1, 42, 0, 4); // from, to, token, amount
+    panic!("this line shouldn't appear in cargo test result");
+}
+
+#[test]
+#[should_panic]
+fn transfer_batch_exceeding_balance_panics() {
+    let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
+    contract.mint_batch(1, vec![0,1,2], vec![3,4,5]); // to, token, amount
+
+    contract.safe_batch_transfer_from(1, 42, vec![0,1,2], vec![4,2,1]); // from, to, token, amount
+    panic!("this line shouldn't appear in cargo test result");
+}
+
+#[test]
 fn burn_works() {
     let mut contract: Contract<TestConfig> = Contract::<TestConfig>::default();
     contract.mint(1, 2, 3); // to, token, amount
