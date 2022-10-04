@@ -4,6 +4,7 @@ use crate::*;
 
 /// Contract struct
 pub struct Contract<T: IConfig> {
+    pub env: T,
     pub owner: T::AccountId,
     // pub total_issuance: T::AccountBalance,
     pub name: T::Text,
@@ -22,11 +23,18 @@ impl<T: IConfig> Contract<T> {
             ..Self::default()
         }
     }
+    pub fn source(&self) -> T::AccountId {
+        self.env.source()
+    }
+    pub fn origin(&self) -> T::AccountId {
+        self.env.origin()
+    }
 }
 
 impl<T: IConfig> Default for Contract<T> {
     fn default() -> Self {
         Self {
+            env: T::default(),
             owner: T::AccountId::zero(),
             // total_issuance: T::AccountBalance::default(),
             name: T::Text::default(),
@@ -63,13 +71,12 @@ impl<T: IConfig> IOwnable<T> for Option<Contract<T>> {
 impl<T: IConfig> IERC1155Check<T> for Contract<T> {
     fn check_transfer_from(
         &mut self,
-        signer: T::AccountId,
-        origin: T::AccountId,
         from: T::AccountId,
         to: T::AccountId,
         token: T::TokenId,
         amount: T::AccountBalance,
     ) {
+        let (signer, origin) = (self.source(), self.origin());
         if from != signer && from != origin && !self.is_approved_for_all(from, signer) {
             panic!("permission denied")
         }
@@ -85,8 +92,6 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
     }
     fn check_batch_transfer_from(
         &mut self,
-        signer: T::AccountId,
-        origin: T::AccountId,
         from: T::AccountId,
         to: T::AccountId,
         token: Vec<T::TokenId>,
@@ -96,17 +101,10 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
             panic!("token and amount length mismatch")
         }
         for (tk, am) in token.iter().zip(amount.clone()) {
-            self.check_transfer_from(signer, origin, from, to, *tk, am)
+            self.check_transfer_from(from, to, *tk, am)
         }
     }
-    fn check_mint(
-        &mut self,
-        _signer: T::AccountId,
-        _origin: T::AccountId,
-        to: T::AccountId,
-        token: T::TokenId,
-        amount: T::AccountBalance,
-    ) {
+    fn check_mint(&mut self, to: T::AccountId, token: T::TokenId, amount: T::AccountBalance) {
         if to.is_zero() {
             panic!("cannot mint to black hole address")
         }
@@ -119,8 +117,6 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
     }
     fn check_mint_batch(
         &mut self,
-        signer: T::AccountId,
-        origin: T::AccountId,
         to: T::AccountId,
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
@@ -129,37 +125,31 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
             panic!("token and amount length mismatch")
         }
         for (tk, am) in token.iter().zip(amount.clone()) {
-            self.check_mint(signer, origin, to, *tk, am)
+            self.check_mint(to, *tk, am)
         }
     }
     fn check_set_approval_for_all(
         &mut self,
-        _signer: T::AccountId,
-        _origin: T::AccountId,
         owner: T::AccountId,
-        operator: T::AccountId,
+        _operator: T::AccountId,
         _approved: bool,
     ) {
-        if !self.is_approved_for_all(owner, operator) {
-            panic!("needs approval")
+        if self.source() != owner && self.origin() != owner {
+            panic!("permission denied")
         }
     }
-    fn check_burn(
-        &mut self,
-        _signer: T::AccountId,
-        _origin: T::AccountId,
-        from: T::AccountId,
-        token: T::TokenId,
-        amount: T::AccountBalance,
-    ) {
+    fn check_burn(&mut self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance) {
+        if self.source() != from && self.origin() != from {
+            if !self.is_approved_for_all(from, self.source()) {
+                panic!("needs approval")
+            }
+        }
         if self.balance_of(from, token) < amount {
             panic!("insufficient balance")
         }
     }
     fn check_burn_batch(
         &mut self,
-        signer: T::AccountId,
-        origin: T::AccountId,
         from: T::AccountId,
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
@@ -168,17 +158,12 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
             panic!("token and amount length mismatch")
         }
         for (tk, am) in token.iter().zip(amount.clone()) {
-            self.check_burn(signer, origin, from, *tk, am)
+            self.check_burn(from, *tk, am)
         }
     }
     // allow owner of token to update metadata
-    fn check_update_token_metadata(
-        &mut self,
-        signer: T::AccountId,
-        origin: T::AccountId,
-        token: T::TokenId,
-        _metadata: Option<TokenMetadata>,
-    ) {
+    fn check_update_token_metadata(&mut self, token: T::TokenId, _metadata: Option<TokenMetadata>) {
+        let (signer, origin) = (self.source(), self.origin());
         if self.balance_of(signer, token).is_zero() || self.balance_of(origin, token).is_zero() {
             panic!("no permission")
         }
@@ -217,6 +202,7 @@ impl<T: IConfig> IERC1155<T> for Contract<T> {
         token: T::TokenId,
         amount: T::AccountBalance,
     ) {
+        self.check_transfer_from(from, to, token, amount);
         if self.balance_of(from, token) < amount {
             panic!("Error: insufficient balance")
         }
@@ -235,6 +221,7 @@ impl<T: IConfig> IERC1155<T> for Contract<T> {
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
     ) {
+        self.check_batch_transfer_from(from, to, token.clone(), amount.clone());
         token
             .iter()
             .enumerate()
@@ -246,6 +233,7 @@ impl<T: IConfig> IERC1155<T> for Contract<T> {
         operator: T::AccountId,
         approved: bool,
     ) {
+        self.check_set_approval_for_all(owner, operator, approved);
         self.approvals
             .entry(owner)
             .and_modify(|kv| {
@@ -284,6 +272,7 @@ impl<T: IConfig> IERC1155Ext<T> for Contract<T> {
         self.symbol.clone()
     }
     fn burn(&mut self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance) {
+        self.check_burn(from, token, amount);
         self.balances.entry(token).and_modify(|kv| {
             kv.entry(from)
                 .and_modify(|v| *v = v.saturating_sub(&amount));
@@ -295,12 +284,14 @@ impl<T: IConfig> IERC1155Ext<T> for Contract<T> {
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
     ) {
+        self.check_burn_batch(from, token.clone(), amount.clone());
         token
             .iter()
             .enumerate()
             .for_each(|(i, tk)| self.burn(from, *tk, amount[i]))
     }
     fn mint(&mut self, to: T::AccountId, token: T::TokenId, amount: T::AccountBalance) {
+        self.check_mint(to, token, amount);
         // debug!("minting {:?} {:?} {:?}", to, token, amount);
         self.balances
             .entry(token)
@@ -321,6 +312,7 @@ impl<T: IConfig> IERC1155Ext<T> for Contract<T> {
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
     ) {
+        self.check_mint_batch(to, token.clone(), amount.clone());
         token
             .iter()
             .enumerate()
@@ -334,6 +326,7 @@ impl<T: IConfig> ITokenMetadataRegistry<T> for Contract<T> {
         self.metadata_registry.get(&token).cloned()
     }
     fn update_token_metadata(&mut self, token: T::TokenId, metadata: Option<TokenMetadata>) {
+        self.check_update_token_metadata(token, metadata.clone());
         match metadata {
             Some(m) => {
                 self.metadata_registry.insert(token, m);
@@ -355,7 +348,7 @@ impl IERC1155GearExt for Contract<GearConfig> {
         token: u128,
         amount: u128,
     ) {
-        msg::reply(
+        gstd::msg::reply(
             Event::TransferSingle {
                 operator,
                 from,
@@ -375,7 +368,7 @@ impl IERC1155GearExt for Contract<GearConfig> {
         token: Vec<u128>,
         amount: Vec<u128>,
     ) {
-        msg::reply(
+        gstd::msg::reply(
             Event::TransferBatch {
                 operator,
                 from,
@@ -388,7 +381,7 @@ impl IERC1155GearExt for Contract<GearConfig> {
         .expect("Failed to reply Event::TransferBatch");
     }
     fn emit_approval_for_all_event(&self, owner: ActorId, operator: ActorId, approved: bool) {
-        msg::reply(
+        gstd::msg::reply(
             Event::ApprovalForAll {
                 owner,
                 operator,
@@ -399,6 +392,6 @@ impl IERC1155GearExt for Contract<GearConfig> {
         .expect("Failed to reply Event::ApprovalForAll");
     }
     fn emit_uri_event(&self, value: String, token: u128) {
-        msg::reply(Event::URI { value, token }, 0).expect("Failed to reply Event::URI");
+        gstd::msg::reply(Event::URI { value, token }, 0).expect("Failed to reply Event::URI");
     }
 }

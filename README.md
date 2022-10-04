@@ -58,11 +58,9 @@ features:
   - this interface is kept as small as possible to make the code moduler.
   - mint, burn and other safety check methods are specified in IERC1155Ext,
     IERC1155Check, ...
-  - implementation caveat: `safe_*` methods are actually not safe if they are
-    invoked before IERC1155Check methods.
 - able to transfer, mint or burn several tokens at once;
   - see [IERC1155Ext](./lib.rs) trait and [implementation](./contract.rs)
-  - implementation caveat: `mint` the same token id twice is forbidden, which
+  - in this implementation, minting the same token id twice is forbidden, which
     means the total supply of any minted token will not increase after they are
     minted
 - emit events when transactions succeed
@@ -79,8 +77,7 @@ features:
     both fungible and non fungible tokens. The token metadata is empty by
     default and is supposed to be set manually after mint using the
     `update_token_metadata` method
-- basic contract ownership management, access control.
-  - see [IOwnable](./lib.rs) trait and [implementation](./contract.rs)
+  - in this implementation, both token owner and approved user are allowed to update token metadata.
 
 TODO:
 
@@ -93,8 +90,10 @@ TODO:
 - [x] implement IERC1155Check: perform sanity checks on user input before
       invoking `mint`, `mint_batch`, `safe_transfer_from`,
       `safe_batch_transfer_from`, etc. before any state mutation.
+- [x] add methods for obtaining caller info in IConfig
+- [x] refactor IERC1155 to make IERC1155Check a requirement: `pub trait IERC1155<T: IConfig>: IERC1155Check<T>`
 - [ ] Comprehensive testing covering all possible bad cases. Currently there are
-      only a few good cases (need help: how to handle panic cases?)
+      only a few good cases (Help wanted: what is the preferred way to handle panic cases in `handle.rs`?)
 - [ ] Submit result
 
 <!-- End of description -->

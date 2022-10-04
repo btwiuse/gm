@@ -9,7 +9,7 @@
 use crate::*;
 
 /// GearConfig implements IConfig for gear environment
-#[derive(Clone, Copy)]
+#[derive(Default, Clone, Copy)]
 pub struct GearConfig;
 
 impl IConfig for GearConfig {
@@ -18,11 +18,33 @@ impl IConfig for GearConfig {
     type TokenDecimal = u8;
     type TokenId = u128;
     type Text = String;
+    fn origin(&self) -> Self::AccountId {
+        gstd::exec::origin()
+    }
+    fn source(&self) -> Self::AccountId {
+        gstd::msg::source()
+    }
 }
 
 /// GearConfig implements IConfig for testing environment
-#[derive(Clone, Copy)]
-pub struct TestConfig;
+#[derive(Default, Clone, Copy)]
+pub struct TestConfig {
+    pub origin: u8,
+    pub source: u8,
+}
+
+impl TestConfig {
+    fn set_source(&mut self, source: u8) {
+        self.source = source;
+    }
+    fn set_origin(&mut self, origin: u8) {
+        self.origin = origin;
+    }
+    pub fn set_source_origin(&mut self, source: u8, origin: u8) {
+        self.set_source(source);
+        self.set_origin(origin);
+    }
+}
 
 impl IConfig for TestConfig {
     type AccountId = u8;
@@ -30,4 +52,10 @@ impl IConfig for TestConfig {
     type TokenDecimal = u8;
     type TokenId = u8;
     type Text = String;
+    fn origin(&self) -> Self::AccountId {
+        self.origin
+    }
+    fn source(&self) -> Self::AccountId {
+        self.source
+    }
 }

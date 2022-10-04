@@ -4,7 +4,7 @@ use crate::*;
 
 #[no_mangle]
 unsafe extern "C" fn meta_state() -> *mut [i32; 2] {
-    let query: Query = msg::load().expect("failed to decode input argument");
+    let query: Query = gstd::msg::load().expect("failed to decode input argument");
     let state = STATE.as_ref().expect("failed to get contract state");
     let encoded = match query {
         Query::Name => State::Name(state.name()),

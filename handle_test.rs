@@ -61,11 +61,11 @@ fn mint_twice_panics() {
 
     program.send(42, mint_msg.clone());
     program.send(42, mint_msg.clone()); // should panic
-    // TODO how to assert panic in tests?
-    // panic!("this line shouldn't appear in cargo test result");
-    //
-    // TODO why this panics?
-    // debug!("this line shouldn't appear in cargo test result");
+                                        // TODO how to assert panic in tests?
+                                        // panic!("this line shouldn't appear in cargo test result");
+                                        //
+                                        // TODO why this panics?
+                                        // debug!("this line shouldn't appear in cargo test result");
 }
 
 #[test]

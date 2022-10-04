@@ -4,7 +4,7 @@
 #![feature(trait_alias)]
 #![no_std]
 
-use gstd::{debug, exec, msg, prelude::*, ActorId};
+use gstd::{prelude::*, ActorId};
 
 pub mod codec;
 pub mod config;
@@ -36,8 +36,6 @@ pub trait IOwnable<T: IConfig> {
 pub trait IERC1155Check<T: IConfig> {
     fn check_transfer_from(
         &mut self,
-        signer: T::AccountId,
-        origin: T::AccountId,
         from: T::AccountId,
         to: T::AccountId,
         token: T::TokenId,
@@ -45,60 +43,32 @@ pub trait IERC1155Check<T: IConfig> {
     );
     fn check_batch_transfer_from(
         &mut self,
-        signer: T::AccountId,
-        origin: T::AccountId,
         from: T::AccountId,
         to: T::AccountId,
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
     );
-    fn check_mint(
-        &mut self,
-        signer: T::AccountId,
-        origin: T::AccountId,
-        to: T::AccountId,
-        token: T::TokenId,
-        amount: T::AccountBalance,
-    );
+    fn check_mint(&mut self, to: T::AccountId, token: T::TokenId, amount: T::AccountBalance);
     fn check_mint_batch(
         &mut self,
-        signer: T::AccountId,
-        origin: T::AccountId,
         to: T::AccountId,
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
     );
     fn check_set_approval_for_all(
         &mut self,
-        signer: T::AccountId,
-        origin: T::AccountId,
         owner: T::AccountId,
         operator: T::AccountId,
         approved: bool,
     );
-    fn check_burn(
-        &mut self,
-        signer: T::AccountId,
-        origin: T::AccountId,
-        from: T::AccountId,
-        token: T::TokenId,
-        amount: T::AccountBalance,
-    );
+    fn check_burn(&mut self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance);
     fn check_burn_batch(
         &mut self,
-        signer: T::AccountId,
-        origin: T::AccountId,
         from: T::AccountId,
         token: Vec<T::TokenId>,
         amount: Vec<T::AccountBalance>,
     );
-    fn check_update_token_metadata(
-        &mut self,
-        signer: T::AccountId,
-        origin: T::AccountId,
-        token: T::TokenId,
-        metadata: Option<TokenMetadata>,
-    );
+    fn check_update_token_metadata(&mut self, token: T::TokenId, metadata: Option<TokenMetadata>);
 }
 
 /// ERC1155 interface gear extension
@@ -124,7 +94,7 @@ pub trait IERC1155GearExt {
 }
 
 /// ERC1155 interface extension
-pub trait IERC1155Ext<T: IConfig> {
+pub trait IERC1155Ext<T: IConfig>: IERC1155<T> {
     fn name(&self) -> T::Text;
     fn symbol(&self) -> T::Text;
     fn burn(&mut self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance);
@@ -158,7 +128,7 @@ pub trait ITokenMetadataRegistry<T: IConfig> {
 // https://eips.ethereum.org/EIPS/eip-1155
 // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155.sol
 // https://github.com/paritytech/ink/blob/master/examples/erc1155/lib.rs
-pub trait IERC1155<T: IConfig> {
+pub trait IERC1155<T: IConfig>: IERC1155Check<T> {
     fn balance_of(&self, who: T::AccountId, token: T::TokenId) -> T::AccountBalance;
     fn balance_of_batch(
         &self,
@@ -186,12 +156,14 @@ pub trait IERC1155<T: IConfig> {
 /// configuration trait that abstracts contract implementation from concrete types
 ///
 /// making the contract testable without gear dependencies
-pub trait IConfig {
+pub trait IConfig: Default {
     type AccountId: IAccountId;
     type AccountBalance: IAccountBalance;
     type Text: IText;
     type TokenDecimal: ITokenDecimal;
     type TokenId: ITokenId;
+    fn origin(&self) -> Self::AccountId;
+    fn source(&self) -> Self::AccountId;
 }
 
 /// token id trait alias
