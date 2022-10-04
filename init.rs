@@ -3,6 +3,7 @@
 use crate::*;
 
 #[no_mangle]
+/// # Safety
 pub unsafe extern "C" fn init() {
     let Init {
         name,

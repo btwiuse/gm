@@ -134,7 +134,7 @@ fn default_approval_for_all_is_false() {
     contract.mint(1, 2, 3); // to, token, amount
 
     let approved = contract.is_approved_for_all(1, 42); // owner, operator
-    assert_eq!(approved, false);
+    assert!(!approved);
 }
 
 #[test]
@@ -152,11 +152,11 @@ fn set_approval_for_all_from_sender_works() {
 
     contract.set_approval_for_all(1, 42, true); // owner, operator
     let approved = contract.is_approved_for_all(1, 42); // owner, operator
-    assert_eq!(approved, true);
+    assert!(approved);
 
     contract.set_approval_for_all(1, 42, false); // owner, operator
     let approved = contract.is_approved_for_all(1, 42); // owner, operator
-    assert_eq!(approved, false);
+    assert!(!approved);
 }
 
 #[test]
@@ -168,11 +168,11 @@ fn set_approval_for_all_works() {
     contract.set_approval_for_all(1, 42, true); // owner, operator
 
     let approved = contract.is_approved_for_all(1, 42); // owner, operator
-    assert_eq!(approved, true);
+    assert!(approved);
 
     contract.set_approval_for_all(1, 42, false); // owner, operator
     let approved = contract.is_approved_for_all(1, 42); // owner, operator
-    assert_eq!(approved, false);
+    assert!(approved);
 }
 
 #[test]
@@ -204,5 +204,5 @@ fn update_token_metadata_works() {
 
     contract.update_token_metadata(2, None);
     let metadata = contract.get_token_metadata(2);
-    assert_eq!(metadata, None);
+    assert!(metadata.is_none());
 }
