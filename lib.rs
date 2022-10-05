@@ -16,6 +16,7 @@ pub mod query;
 pub mod state;
 
 mod contract_test;
+mod handle_panic_test;
 mod handle_test;
 mod init_test;
 mod query_test;
