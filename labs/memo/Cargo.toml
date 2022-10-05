@@ -1,0 +1,19 @@
+[package]
+name = "memo"
+version = "0.1.0"
+edition = "2021"
+description = "a gear contract that logs its input"
+license = "MIT"
+authors = ["btwiuse"]
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+gstd = { git = "https://github.com/btwiuse/gear.git", features = ["debug"] }
+
+[dev-dependencies]
+gtest = { git = "https://github.com/btwiuse/gear.git" }
+
+[build-dependencies]
+gear-wasm-builder = { git = "https://github.com/btwiuse/gear.git" }

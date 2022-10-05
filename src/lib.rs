@@ -1,41 +1,244 @@
+//! high level trait definitions and abstractions,
+//! also acts as prelude for the entire crate
+
+#![feature(trait_alias)]
 #![no_std]
 
-use gstd::{debug, msg, prelude::*};
+use gstd::{prelude::*, ActorId};
 
-#[no_mangle]
-unsafe extern "C" fn handle() {
-    debug!("handle()");
-    let payload = String::from_utf8(msg::load_bytes()).expect("Invalid handle message");
+pub mod codec;
+pub mod config;
+pub mod contract;
+pub mod handle;
+pub mod init;
+pub mod metadata;
+pub mod query;
+pub mod state;
 
-    if payload == "Hello" {
-        msg::reply(b"World", 0).unwrap();
+pub use crate::codec::{Action, Event, Init, InitOk, Query, State, TokenMetadata};
+pub use config::{GearConfig, MockConfig};
+pub use contract::Contract;
+pub use state::STATE;
+
+/// ERC1155 interface check extension
+pub trait IERC1155Check<T: IConfig> {
+    fn check_transfer_from(
+        &self,
+        from: T::AccountId,
+        to: T::AccountId,
+        token: T::TokenId,
+        amount: T::AccountBalance,
+    );
+    fn check_batch_transfer_from(
+        &self,
+        from: T::AccountId,
+        to: T::AccountId,
+        token: Vec<T::TokenId>,
+        amount: Vec<T::AccountBalance>,
+    );
+    fn check_balance_of_batch(&self, who: Vec<T::AccountId>, token: Vec<T::TokenId>);
+    fn check_mint(&self, to: T::AccountId, token: T::TokenId, amount: T::AccountBalance);
+    fn check_mint_batch(
+        &self,
+        to: T::AccountId,
+        token: Vec<T::TokenId>,
+        amount: Vec<T::AccountBalance>,
+    );
+    fn check_set_approval_for_all(
+        &self,
+        owner: T::AccountId,
+        operator: T::AccountId,
+        approved: bool,
+    );
+    fn check_burn(&self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance);
+    fn check_burn_batch(
+        &self,
+        from: T::AccountId,
+        token: Vec<T::TokenId>,
+        amount: Vec<T::AccountBalance>,
+    );
+    fn check_update_token_metadata(&self, token: T::TokenId, metadata: Option<TokenMetadata>);
+}
+
+/// ERC1155 interface gear extension
+pub trait IERC1155GearExt {
+    fn emit_transfer_single_event(
+        &self,
+        operator: ActorId,
+        from: ActorId,
+        to: ActorId,
+        token: u128,
+        amount: u128,
+    );
+    fn emit_transfer_batch_event(
+        &self,
+        operator: ActorId,
+        from: ActorId,
+        to: ActorId,
+        token: Vec<u128>,
+        amount: Vec<u128>,
+    );
+    fn emit_approval_for_all_event(&self, owner: ActorId, spender: ActorId, approved: bool);
+    fn emit_uri_event(&self, value: String, token: u128);
+    /// whoami is a utility method for emitting an event containing sender and origin of the current tx
+    fn emit_whoami_event(&self);
+    fn emit_update_token_metadata_event(&self, token: u128, metadata: Option<TokenMetadata>);
+}
+
+/// ERC1155 interface extension
+pub trait IERC1155Ext<T: IConfig>: IERC1155<T> {
+    fn name(&self) -> T::Text;
+    fn symbol(&self) -> T::Text;
+    fn burn(&mut self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance);
+    fn burn_batch(
+        &mut self,
+        from: T::AccountId,
+        token: Vec<T::TokenId>,
+        amount: Vec<T::AccountBalance>,
+    );
+    fn mint(&mut self, to: T::AccountId, token: T::TokenId, amount: T::AccountBalance);
+    fn mint_batch(
+        &mut self,
+        to: T::AccountId,
+        token: Vec<T::TokenId>,
+        amount: Vec<T::AccountBalance>,
+    );
+}
+
+/// ERC1155MetadataURI interface definition
+// https://eips.ethereum.org/EIPS/eip-1155#metadata
+pub trait IERC1155MetadataURI<T: IConfig> {
+    fn uri(&self, token: T::TokenId) -> T::Text;
+}
+
+pub trait ITokenMetadataRegistry<T: IConfig> {
+    fn get_token_metadata(&self, token: T::TokenId) -> Option<TokenMetadata>;
+    fn update_token_metadata(&mut self, token: T::TokenId, metadata: Option<TokenMetadata>);
+}
+
+/// ERC1155 interface definition
+// https://eips.ethereum.org/EIPS/eip-1155
+// https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155.sol
+// https://github.com/paritytech/ink/blob/master/examples/erc1155/lib.rs
+pub trait IERC1155<T: IConfig>: IERC1155Check<T> {
+    fn balance_of(&self, who: T::AccountId, token: T::TokenId) -> T::AccountBalance;
+    fn balance_of_batch(
+        &self,
+        who: Vec<T::AccountId>,
+        token: Vec<T::TokenId>,
+    ) -> Vec<T::AccountBalance>;
+    fn safe_transfer_from(
+        &mut self,
+        from: T::AccountId,
+        to: T::AccountId,
+        token: T::TokenId,
+        amount: T::AccountBalance,
+    );
+    fn safe_batch_transfer_from(
+        &mut self,
+        from: T::AccountId,
+        to: T::AccountId,
+        token: Vec<T::TokenId>,
+        amount: Vec<T::AccountBalance>,
+    );
+    fn set_approval_for_all(&mut self, owner: T::AccountId, operator: T::AccountId, approved: bool);
+    fn is_approved_for_all(&self, owner: T::AccountId, operator: T::AccountId) -> bool;
+}
+
+/// configuration trait that abstracts contract implementation from concrete types
+///
+/// making the contract testable without gear dependencies
+pub trait IConfig: Default {
+    type AccountId: IAccountId;
+    type AccountBalance: IAccountBalance;
+    type Text: IText;
+    type TokenDecimal: ITokenDecimal;
+    type TokenId: ITokenId;
+    fn origin(&self) -> Self::AccountId;
+    fn sender(&self) -> Self::AccountId;
+}
+
+/// token id trait alias
+pub trait ITokenId = Eq + Copy + Clone + core::hash::Hash + Ord + fmt::Debug;
+
+/// account id trait alias
+///
+/// a method for returning the zero address is required.
+pub trait IAccountId = zero::IZero + Eq + Copy + Clone + core::hash::Hash + Ord + fmt::Debug;
+
+/// account balance trait alias
+///
+/// any unsigned integer type that is at least u32 should work.
+pub trait IAccountBalance = num_traits::Zero
+    + num_traits::One
+    + num_traits::CheckedAdd
+    + num_traits::CheckedSub
+    + num_traits::SaturatingAdd
+    + num_traits::SaturatingSub
+    + num_traits::sign::Unsigned
+    + fmt::Debug
+    + Copy
+    + Clone
+    + PartialOrd
+    + Default
+    + From<u16>
+    + From<u32>;
+
+/// token decimal trait alias
+///
+/// any unsigned integer type that is at least u8 should work.
+pub trait ITokenDecimal = num_traits::Zero
+    + num_traits::One
+    + num_traits::CheckedAdd
+    + num_traits::CheckedSub
+    + num_traits::SaturatingAdd
+    + num_traits::SaturatingSub
+    + num_traits::sign::Unsigned
+    + fmt::Debug
+    + Copy
+    + Clone
+    + Default;
+
+/// text trait
+///
+/// default value should be an empty string
+pub trait IText: From<String> + ToString + Clone + fmt::Debug {
+    fn default() -> Self;
+}
+
+impl IText for String {
+    fn default() -> Self {
+        String::from("")
     }
 }
 
-#[no_mangle]
-unsafe extern "C" fn init() {
-    let payload = String::from_utf8(msg::load_bytes()).expect("Invalid init message");
-    debug!("init(): {}", payload);
-}
+/// define IZero trait required by IAccountId and implement it for ActorId and u8
+/// for gear and testing environments respectively
+mod zero {
+    use crate::*;
 
-#[cfg(test)]
-mod tests {
-    extern crate std;
+    /// IZero is a trait with methods for obtaining / comparing with the zero address
+    pub trait IZero {
+        fn zero() -> Self;
+        fn is_zero(&self) -> bool;
+    }
 
-    use gtest::{Log, Program, System};
+    impl IZero for ActorId {
+        fn zero() -> Self {
+            ActorId::zero()
+        }
+        fn is_zero(&self) -> bool {
+            *self == Self::zero()
+        }
+    }
 
-    #[test]
-    fn it_works() {
-        let system = System::new();
-        system.init_logger();
-
-        let program = Program::current(&system);
-
-        let res = program.send_bytes(42, "Let's start");
-        assert!(res.log().is_empty());
-
-        let res = program.send_bytes(42, "Hello");
-        let log = Log::builder().source(1).dest(42).payload_bytes("World");
-        assert!(res.contains(&log));
+    // u8 is used as AccountId in contract_test.rs
+    impl IZero for u8 {
+        fn zero() -> Self {
+            0u8
+        }
+        fn is_zero(&self) -> bool {
+            *self == 0u8
+        }
     }
 }
