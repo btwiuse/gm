@@ -241,6 +241,6 @@ fn update_token_metadata_from_non_owner_panics() {
         ..Default::default()
     };
 
-    contract.update_token_metadata(2, some_metadata.clone());
+    contract.update_token_metadata(2, some_metadata);
     panic!("this line shouldn't appear in cargo test result");
 }

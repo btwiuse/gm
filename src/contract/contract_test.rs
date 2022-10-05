@@ -299,7 +299,7 @@ fn update_token_metadata_works() {
         ..Default::default()
     };
 
-    contract.update_token_metadata(2, some_metadata.clone());
+    contract.update_token_metadata(2, some_metadata);
     assert_eq!(contract.metadata_registry, expected);
 }
 
@@ -320,7 +320,7 @@ fn remove_update_token_metadata_works() {
             sender: 1,
             origin: 1,
         },
-        metadata_registry: BTreeMap::from([(2, some_metadata.clone().unwrap())]),
+        metadata_registry: BTreeMap::from([(2, some_metadata.unwrap())]),
         ..Default::default()
     };
 
