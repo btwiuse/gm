@@ -58,24 +58,28 @@ making the core contract logic testable without relying on gear specific crates.
 features:
 
 - support any combination of fungible and non-fungible tokens;
-  - see [IERC1155](./lib.rs) trait and [implementation](./contract.rs)
+  - see [IERC1155](./src/lib.rs) trait and
+    [implementation](./src/contract/erc1155.rs)
   - this interface is kept as small as possible to make the code moduler.
   - mint, burn and other safety check methods are specified in IERC1155Ext,
     IERC1155Check, ...
 - able to transfer, mint or burn several tokens at once;
-  - see [IERC1155Ext](./lib.rs) trait and [implementation](./contract.rs)
+  - see [IERC1155Ext](./src/lib.rs) trait and
+    [implementation](./src/contract/erc1155_ext.rs)
   - in this implementation, minting the same token id twice is forbidden, which
     means the total supply of any minted token will not increase after they are
     minted
 - emit events when transactions succeed
-  - see [IERC1155GearExt](./lib.rs) trait and [implementation](./contract.rs)
+  - see [IERC1155GearExt](./src/lib.rs) trait and
+    [implementation](./src/contract/erc1155_gear_ext.rs)
   - events are always emitted after the transaction is made
 - abort transaction early when the requirement isn't met
-  - see [IERC1155Check](./lib.rs) trait and [implementation](./contract.rs)
+  - see [IERC1155Check](./src/lib.rs) trait and
+    [implementation](./src/contract/erc1155_check.rs)
   - checks are always performed before the transaction is made
 - approval management and token metadata.
-  - see [ITokenMetadataRegistry](./lib.rs) trait and
-    [implementation](./contract.rs)
+  - see [ITokenMetadataRegistry](./src/contract/token_metadata_registry.rs)
+    trait and [implementation](./src/contract.rs)
   - the token metadata manager is a simple KV store that works similar to
     Metaplex Token Metadata program on Solana. It manages token metadata for
     both fungible and non fungible tokens. The token metadata is empty by
