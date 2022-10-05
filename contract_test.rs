@@ -60,6 +60,7 @@ fn balance_of_works() {
 
 #[test]
 fn balance_of_batch_works() {
+    let expected = vec![1, 2, 3, 0];
     let contract: Contract<MockConfig> = Contract::<MockConfig> {
         balances: BTreeMap::from([
             (0, BTreeMap::from([(1, 1)])),
@@ -71,8 +72,24 @@ fn balance_of_batch_works() {
 
     assert_eq!(
         contract.balance_of_batch(vec![1, 1, 1, 1], vec![0, 1, 2, 3]),
-        vec![1, 2, 3, 0]
+        expected
     ); // who, token
+}
+
+#[test]
+#[should_panic]
+fn balance_of_batch_length_mismatch_panics() {
+    let contract: Contract<MockConfig> = Contract::<MockConfig> {
+        balances: BTreeMap::from([
+            (0, BTreeMap::from([(1, 1)])),
+            (1, BTreeMap::from([(1, 2)])),
+            (2, BTreeMap::from([(1, 3)])),
+        ]),
+        ..Default::default()
+    };
+
+    contract.balance_of_batch(vec![1, 1, 1], vec![0, 1, 2, 3]);
+    panic!("this line shouldn't appear in cargo test result");
 }
 
 #[test]
@@ -89,6 +106,55 @@ fn transfer_works() {
 
     contract.safe_transfer_from(1, 42, 0, 1); // from, to, token, amount
     assert_eq!(contract.balances, expected);
+}
+
+#[test]
+fn transfer_from_approved_works() {
+    let expected = BTreeMap::from([(2, BTreeMap::from([(1, 0), (42, 1)]))]);
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
+        approvals: BTreeMap::from([(1, BTreeMap::from([(42, true)]))]),
+        balances: BTreeMap::from([(2, BTreeMap::from([(1, 1)]))]),
+        env: MockConfig {
+            sender: 42,
+            origin: 42,
+        },
+        ..Default::default()
+    };
+
+    contract.safe_transfer_from(1, 42, 2, 1); // from, to, token, amount
+    assert_eq!(contract.balances, expected);
+}
+
+#[test]
+#[should_panic]
+fn transfer_from_non_owner_panics() {
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
+        balances: BTreeMap::from([(0, BTreeMap::from([(1, 1)]))]),
+        env: MockConfig {
+            sender: 42,
+            origin: 42,
+        },
+        ..Default::default()
+    };
+
+    contract.safe_transfer_from(1, 42, 0, 1); // from, to, token, amount
+    panic!("this line shouldn't appear in cargo test result");
+}
+
+#[test]
+#[should_panic]
+fn transfer_exceeding_balance_panics() {
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
+        balances: BTreeMap::from([(0, BTreeMap::from([(1, 3)]))]),
+        env: MockConfig {
+            sender: 1,
+            origin: 1,
+        },
+        ..Default::default()
+    };
+
+    contract.safe_transfer_from(1, 42, 0, 4); // from, to, token, amount
+    panic!("this line shouldn't appear in cargo test result");
 }
 
 #[test]
@@ -112,23 +178,47 @@ fn transfer_batch_works() {
     };
 
     contract.safe_batch_transfer_from(1, 42, vec![0, 1, 2], vec![3, 2, 1]); // from, to, token, amount
+    assert_eq!(contract.balances, expected);
+}
 
+#[test]
+fn transfer_batch_from_approved_works() {
+    let expected = BTreeMap::from([
+        (0, BTreeMap::from([(1, 0), (42, 3)])),
+        (1, BTreeMap::from([(1, 2), (42, 2)])),
+        (2, BTreeMap::from([(1, 4), (42, 1)])),
+    ]);
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
+        approvals: BTreeMap::from([(1, BTreeMap::from([(42, true)]))]),
+        balances: BTreeMap::from([
+            (0, BTreeMap::from([(1, 3)])),
+            (1, BTreeMap::from([(1, 4)])),
+            (2, BTreeMap::from([(1, 5)])),
+        ]),
+        env: MockConfig {
+            sender: 42,
+            origin: 42,
+        },
+        ..Default::default()
+    };
+
+    contract.safe_batch_transfer_from(1, 42, vec![0, 1, 2], vec![3, 2, 1]); // from, to, token, amount
     assert_eq!(contract.balances, expected);
 }
 
 #[test]
 #[should_panic]
-fn transfer_exceeding_balance_panics() {
+fn transfer_batch_from_non_owner_panics() {
     let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
-        balances: BTreeMap::from([(0, BTreeMap::from([(1, 3)]))]),
+        balances: BTreeMap::from([(0, BTreeMap::from([(1, 1)]))]),
         env: MockConfig {
-            sender: 1,
-            origin: 1,
+            sender: 42,
+            origin: 42,
         },
         ..Default::default()
     };
 
-    contract.safe_transfer_from(1, 42, 0, 4); // from, to, token, amount
+    contract.safe_batch_transfer_from(1, 42, vec![0], vec![1]); // from, to, token, amount
     panic!("this line shouldn't appear in cargo test result");
 }
 
@@ -149,6 +239,22 @@ fn transfer_batch_exceeding_balance_panics() {
     };
 
     contract.safe_batch_transfer_from(1, 42, vec![0, 1, 2], vec![4, 2, 1]); // from, to, token, amount
+    panic!("this line shouldn't appear in cargo test result");
+}
+
+#[test]
+#[should_panic]
+fn transfer_batch_length_mismatch_panics() {
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
+        balances: BTreeMap::from([
+            (0, BTreeMap::from([(1, 1)])),
+            (1, BTreeMap::from([(1, 2)])),
+            (2, BTreeMap::from([(1, 3)])),
+        ]),
+        ..Default::default()
+    };
+
+    contract.safe_batch_transfer_from(1, 42, vec![0, 1, 2], vec![0, 1, 2, 3]);
     panic!("this line shouldn't appear in cargo test result");
 }
 
@@ -240,6 +346,22 @@ fn burn_batch_works() {
 
     contract.burn_batch(1, vec![0, 1, 2], vec![3, 3, 3]); // from, token, amount
     assert_eq!(contract.balances, expected);
+}
+
+#[test]
+#[should_panic]
+fn burn_batch_length_mismatch_panics() {
+    let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
+        balances: BTreeMap::from([
+            (0, BTreeMap::from([(1, 1)])),
+            (1, BTreeMap::from([(1, 2)])),
+            (2, BTreeMap::from([(1, 3)])),
+        ]),
+        ..Default::default()
+    };
+
+    contract.burn_batch(1, vec![0, 1, 2], vec![0, 1, 2, 3]);
+    panic!("this line shouldn't appear in cargo test result");
 }
 
 #[test]
