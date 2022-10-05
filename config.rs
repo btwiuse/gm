@@ -2,7 +2,7 @@
 //!
 //! GearConfig is used in formal code, see state.rs.
 //!
-//! For testing purpose, MockConfig is preferred, see contract_test.rs
+//! For testing purpose, MockConfig is preferred, see contract_panic_test.rs and contract_test.rs
 
 use crate::*;
 

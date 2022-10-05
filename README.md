@@ -94,10 +94,91 @@ TODO:
 - [x] add methods for obtaining caller info in IConfig
 - [x] refactor IERC1155 to make IERC1155Check a requirement:
       `pub trait IERC1155<T: IConfig>: IERC1155Check<T>`
-- [ ] Comprehensive testing covering all possible bad cases. Currently there are
-      only a few good cases (Help wanted: what is the preferred way to handle
-      panic cases in `handle.rs`?)
-- [ ] Submit result
+- [x] Comprehensive testing covering all possible bad cases.
+- [x] Submit result
+
+Testing:
+
+```
+$ cargo test
+   Compiling gm v0.1.0 (/home/btwiuse/gm)
+    Finished test [unoptimized + debuginfo] target(s) in 4.12s
+     Running unittests lib.rs (target/debug/deps/gm-aedc5d0e158877c4)
+
+running 54 tests
+test contract_panic_test::balance_of_batch_length_mismatch_panics - should panic ... ok
+test contract_panic_test::burn_batch_from_non_owner_panics - should panic ... ok
+test contract_panic_test::burn_exceeding_balance_panics - should panic ... ok
+test contract_panic_test::burn_batch_exceeding_balance_panics - should panic ... ok
+test contract_panic_test::burn_from_non_owner_panics - should panic ... ok
+test contract_panic_test::mint_twice_panics - should panic ... ok
+test contract_panic_test::transfer_batch_exceeding_balance_panics - should panic ... ok
+test contract_panic_test::set_approval_for_all_from_non_owner_panics - should panic ... ok
+test contract_panic_test::transfer_batch_length_mismatch_panics - should panic ... ok
+test contract_panic_test::mint_batch_twice_panics - should panic ... ok
+test contract_panic_test::transfer_batch_from_non_owner_panics - should panic ... ok
+test contract_panic_test::burn_batch_length_mismatch_panics - should panic ... ok
+test contract_panic_test::transfer_exceeding_balance_panics - should panic ... ok
+test contract_panic_test::transfer_from_non_owner_panics - should panic ... ok
+test contract_panic_test::update_token_metadata_from_non_owner_panics - should panic ... ok
+test contract_test::balance_of_batch_works ... ok
+test contract_test::balance_of_works ... ok
+test contract_test::burn_batch_from_approved_works ... ok
+test contract_test::burn_batch_works ... ok
+test contract_test::burn_from_approved_works ... ok
+test contract_test::burn_works ... ok
+test contract_test::default_approval_for_all_is_false ... ok
+test contract_test::default_token_metadata_is_none ... ok
+test contract_test::is_approved_for_all_works ... ok
+test contract_test::mint_batch_works ... ok
+test contract_test::mint_works ... ok
+test contract_test::remove_update_token_metadata_works ... ok
+test contract_test::set_approval_for_all_from_sender_works ... ok
+test contract_test::set_approval_for_all_works ... ok
+test contract_test::transfer_batch_from_approved_works ... ok
+test contract_test::transfer_batch_works ... ok
+test contract_test::transfer_from_approved_works ... ok
+test contract_test::transfer_works ... ok
+test contract_test::update_token_metadata_works ... ok
+[DEBUG handle_panic_test::mint_zero_panics] panic occurred: 'check failed: cannot mint 0 amount', /home/btwiuse/gm/contract.rs:92:13
+test init_test::init_works ... ok
+test handle_panic_test::mint_zero_panics ... ok
+[DEBUG handle_panic_test::transfer_exceeding_balance_panics] panic occurred: 'check failed: insufficient balance', /home/btwiuse/gm/contract.rs:64:13
+test handle_panic_test::transfer_exceeding_balance_panics ... ok
+[DEBUG handle_panic_test::transfer_zero_panics] panic occurred: 'check failed: cannot transfer 0 amount', /home/btwiuse/gm/contract.rs:58:13
+test handle_test::mint_works ... ok
+test handle_panic_test::transfer_zero_panics ... ok
+[DEBUG handle_panic_test::burn_zero_panics] panic occurred: 'check failed: cannot burn 0 amount', /home/btwiuse/gm/contract.rs:128:13
+test handle_panic_test::burn_zero_panics ... ok
+[DEBUG handle_panic_test::burn_exceeding_balance_panics] panic occurred: 'check failed: insufficient balance', /home/btwiuse/gm/contract.rs:134:13
+test handle_panic_test::burn_exceeding_balance_panics ... ok
+test handle_test::set_approval_for_all_works ... ok
+test handle_test::burn_works ... ok
+[DEBUG handle_panic_test::mint_twice_panics] panic occurred: 'check failed: cannot mint twice', /home/btwiuse/gm/contract.rs:95:13
+test handle_test::mint_batch_works ... ok
+test handle_panic_test::mint_twice_panics ... ok
+test query_test::basic_query_works ... ok
+test handle_test::burn_batch_works ... ok
+[DEBUG handle_panic_test::transfer_batch_length_mismatch_panics] panic occurred: 'check failed: token and amount length mismatch', /home/btwiuse/gm/contract.rs:81:13
+test handle_panic_test::transfer_batch_length_mismatch_panics ... ok
+[DEBUG handle_panic_test::transfer_batch_length_mismatch_works] panic occurred: 'check failed: token and amount length mismatch', /home/btwiuse/gm/contract.rs:81:13
+test handle_panic_test::transfer_batch_length_mismatch_works ... ok
+[DEBUG handle_panic_test::transfer_from_non_owner_panics] panic occurred: 'check failed: needs approval', /home/btwiuse/gm/contract.rs:61:13
+test handle_panic_test::transfer_from_non_owner_panics ... ok
+test handle_test::transfer_works ... ok
+[DEBUG handle_panic_test::burn_batch_length_mismatch_panics] panic occurred: 'check failed: token and amount length mismatch', /home/btwiuse/gm/contract.rs:144:13
+test handle_panic_test::burn_batch_length_mismatch_panics ... ok
+test handle_test::transfer_batch_works ... ok
+test handle_test::update_token_metadata_works ... ok
+
+test result: ok. 54 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+   Doc-tests gm
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+```
 
 <!-- End of description -->
 

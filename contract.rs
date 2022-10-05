@@ -54,6 +54,9 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
         token: T::TokenId,
         amount: T::AccountBalance,
     ) {
+        if amount.is_zero() {
+            panic!("check failed: cannot transfer 0 amount")
+        }
         if from != self.sender() && !self.is_approved_for_all(from, self.sender()) {
             panic!("check failed: needs approval")
         }
@@ -121,6 +124,9 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
         }
     }
     fn check_burn(&self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance) {
+        if amount.is_zero() {
+            panic!("check failed: cannot burn 0 amount")
+        }
         if from != self.sender() && !self.is_approved_for_all(from, self.sender()) {
             panic!("check failed: needs approval")
         }
