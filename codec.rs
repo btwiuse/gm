@@ -80,7 +80,7 @@ pub mod transaction {
             token: Vec<u128>,
             amount: Vec<u128>,
         },
-        ApprovalForAll {
+        ApprovedForAll {
             owner: ActorId,
             operator: ActorId,
             approved: bool,

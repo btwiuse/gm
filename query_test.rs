@@ -21,18 +21,18 @@ fn basic_query_works() {
         },
     );
 
-    let name = program
-        .meta_state::<Query, State>(Query::Name)
+    let name: State = program
+        .meta_state(Query::Name)
         .expect("failed to query name");
     assert_eq!(name, State::Name("gm".to_string()));
 
-    let symbol = program
-        .meta_state::<Query, State>(Query::Symbol)
+    let symbol: State = program
+        .meta_state(Query::Symbol)
         .expect("failed to query symbol");
     assert_eq!(symbol, State::Symbol("GM".to_string()));
 
-    let base_uri = program
-        .meta_state::<Query, State>(Query::BaseUri)
+    let base_uri: State = program
+        .meta_state(Query::BaseUri)
         .expect("failed to query base_uri");
     assert_eq!(base_uri, State::BaseUri("https://gm.dev/{}".to_string()));
 }

@@ -368,14 +368,14 @@ impl IERC1155GearExt for Contract<GearConfig> {
     }
     fn emit_approval_for_all_event(&self, owner: ActorId, operator: ActorId, approved: bool) {
         gstd::msg::reply(
-            Event::ApprovalForAll {
+            Event::ApprovedForAll {
                 owner,
                 operator,
                 approved,
             },
             0,
         )
-        .expect("Failed to reply Event::ApprovalForAll");
+        .expect("Failed to reply Event::ApprovedForAll");
     }
     fn emit_uri_event(&self, value: String, token: u128) {
         gstd::msg::reply(Event::URI { value, token }, 0).expect("Failed to reply Event::URI");
