@@ -24,24 +24,29 @@ A loose implementation of the ERC1155 multitoken standard for Gear
 Directory layout:
 
 ```
-.
-├── lib.rs            // High level abstractions and trait definitions: IERC1155, IERC1155GearExt, ITokenMetadataRegistry, ...
-├── codec.rs          // Encoder and Decoder types for contract IO: initialization, transaction input, events, state query, token metadata
-├── config.rs         // Provides implementations to IConfig for standard and testing environment: GearConfig, MockConfig
-├── contract.rs       // Contract<T: IConfig> implements IERC1155, IERC1155GearExt, ITokenMetadataRegistry, ...
-├── contract_test.rs  // contract core logic related tests, using MockConfig, without explicit dependency on gstd, gtest
+src/
+├── build.rs                     // cargo build script
+├── codec.rs                     // Encoder and Decoder types for contract IO: Init, InitOk, Action, Event, Query, State, TokenMetadata
+├── config.rs                    // Provides implementations to IConfig for standard and testing environment: GearConfig, MockConfig
+├── contract                     
+│   ├── contract_panic_test.rs   // contract core logic positive test cases, using MockConfig, without explicit dependency on gstd, gtest
+│   ├── contract_test.rs         // contract core logic positive test cases, using MockConfig, without explicit dependency on gstd, gtest
+│   └── mod.rs                   // Contract<T: IConfig> implements IERC1155, IERC1155GearExt, ITokenMetadataRegistry, ...
+├── handle
+│   ├── handle_panic_test.rs     // fn handle() negative test cases
+│   ├── handle_test.rs           // fn handle() positive test cases
+│   └── mod.rs                   // fn handle()
+├── init
+│   ├── init_test.rs             // fn init() test cases
+│   └── mod.rs                   // fn init()
+├── lib.rs                       // High level abstractions and trait definitions: IERC1155, IERC1155GearExt, ITokenMetadataRegistry, ...
+├── metadata.rs                  // gstd::metadata!
+├── query
+│   ├── mod.rs                   // fn meta_state()
+│   └── query_test.rs            // fn meta_state() test cases
+└── state.rs                     // pub static mut STATE: Option<Contract<GearConfig>>
 
-├── state.rs          // pub static mut STATE: Option<Contract<GearConfig>>
-├── metadata.rs       // gstd::metadata!
-├── handle.rs         // fn handle()
-├── init.rs           // fn init()
-├── query.rs          // fn meta_state()
-
-├── handle_test.rs    // fn handle() related tests
-├── init_test.rs      // fn init() related tests
-├── query_test.rs     // fn meta_state() related tests
-
-└── build.rs          // cargo build script
+4 directories, 16 files
 ```
 
 The main contract implementation is in [contract.rs](./contract.rs). It applies

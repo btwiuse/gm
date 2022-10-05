@@ -26,17 +26,23 @@ fn mint_twice_panics() {
     let program = Program::current(&system);
     init_program(&program);
 
-    let _ = program.send(42, Action::Mint {
-        to: ActorId::from(42),
-        token: 0,
-        amount: 1,
-    });
+    let _ = program.send(
+        42,
+        Action::Mint {
+            to: ActorId::from(42),
+            token: 0,
+            amount: 1,
+        },
+    );
 
-    let res = program.send(42, Action::Mint {
-        to: ActorId::from(42),
-        token: 0,
-        amount: 1,
-    });
+    let res = program.send(
+        42,
+        Action::Mint {
+            to: ActorId::from(42),
+            token: 0,
+            amount: 1,
+        },
+    );
 
     assert!(res.main_failed());
 }
@@ -152,11 +158,14 @@ fn transfer_from_non_owner_panics() {
     let program = Program::current(&system);
     init_program(&program);
 
-    program.send(42, Action::Mint {
-        to: ActorId::from(42),
-        token: 0,
-        amount: 1,
-    });
+    program.send(
+        42,
+        Action::Mint {
+            to: ActorId::from(42),
+            token: 0,
+            amount: 1,
+        },
+    );
 
     let res = program.send(
         69,
@@ -259,4 +268,3 @@ fn transfer_batch_length_mismatch_works() {
 
     assert!(res.main_failed());
 }
-

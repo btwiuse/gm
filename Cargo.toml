@@ -6,9 +6,6 @@ license = "MIT"
 authors = ["Gear Technologies", "Hangbiao Zou (btwiuse)"]
 description = "Gear Multitoken"
 
-[lib]
-path = "lib.rs"
-
 [dependencies]
 gstd = { git = "https://github.com/btwiuse/gear.git", features = ["debug"] }
 scale-info = { version = "2.1.1", default-features = false, features = ["derive"] }

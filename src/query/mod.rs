@@ -2,6 +2,8 @@
 
 use crate::*;
 
+mod query_test;
+
 #[no_mangle]
 unsafe extern "C" fn meta_state() -> *mut [i32; 2] {
     let query: Query = gstd::msg::load().expect("failed to decode input argument");

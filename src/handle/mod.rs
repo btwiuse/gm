@@ -2,6 +2,9 @@
 
 use crate::*;
 
+mod handle_panic_test;
+mod handle_test;
+
 #[no_mangle]
 unsafe extern "C" fn handle() {
     let sender: ActorId = gstd::msg::source();

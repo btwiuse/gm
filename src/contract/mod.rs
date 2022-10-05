@@ -2,6 +2,9 @@
 
 use crate::*;
 
+mod contract_panic_test;
+mod contract_test;
+
 /// Contract struct
 pub struct Contract<T: IConfig> {
     pub env: T,

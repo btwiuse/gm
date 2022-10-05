@@ -2,6 +2,8 @@
 
 use crate::*;
 
+mod init_test;
+
 #[no_mangle]
 /// # Safety
 pub unsafe extern "C" fn init() {
