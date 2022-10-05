@@ -25,7 +25,6 @@ Directory layout:
 
 ```
 src/
-├── build.rs                     // cargo build script
 ├── codec.rs                     // Encoder and Decoder types for contract IO: Init, InitOk, Action, Event, Query, State, TokenMetadata
 ├── config.rs                    // Provides implementations to IConfig for standard and testing environment: GearConfig, MockConfig
 ├── contract                     
