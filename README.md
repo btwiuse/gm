@@ -28,7 +28,7 @@ src/
 ├── codec.rs                     // Encoder and Decoder types for contract IO: Init, InitOk, Action, Event, Query, State, TokenMetadata
 ├── config.rs                    // Provides implementations to IConfig for standard and testing environment: GearConfig, MockConfig
 ├── contract                     
-│   ├── contract_panic_test.rs   // contract core logic positive test cases, using MockConfig, without explicit dependency on gstd, gtest
+│   ├── contract_panic_test.rs   // contract core logic negative test cases, using MockConfig, without explicit dependency on gstd, gtest
 │   ├── contract_test.rs         // contract core logic positive test cases, using MockConfig, without explicit dependency on gstd, gtest
 │   └── mod.rs                   // Contract<T: IConfig> implements IERC1155, IERC1155GearExt, ITokenMetadataRegistry, ...
 ├── handle
@@ -48,7 +48,7 @@ src/
 4 directories, 16 files
 ```
 
-The main contract implementation is in [contract.rs](./contract.rs). It applies
+The main contract implementation is in [./src/contract](./src/contract). It applies
 the generics pattern mentioned in
 
 https://github.com/shawntabrizi/substrate-trait-tutorial/blob/master/src/step5.rs
