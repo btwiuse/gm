@@ -14,7 +14,7 @@ mod token_metadata_registry;
 
 /// Contract struct
 pub struct Contract<T: IConfig> {
-    pub env: T,
+    pub ctx: T,
     pub owner: T::AccountId,
     pub name: T::Text,
     pub symbol: T::Text,
@@ -33,17 +33,17 @@ impl<T: IConfig> Contract<T> {
         }
     }
     pub fn sender(&self) -> T::AccountId {
-        self.env.sender()
+        self.ctx.sender()
     }
     pub fn origin(&self) -> T::AccountId {
-        self.env.origin()
+        self.ctx.origin()
     }
 }
 
 impl<T: IConfig> Default for Contract<T> {
     fn default() -> Self {
         Self {
-            env: T::default(),
+            ctx: T::default(),
             owner: T::AccountId::zero(),
             name: T::Text::default(),
             symbol: T::Text::default(),

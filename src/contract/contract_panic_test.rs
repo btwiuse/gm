@@ -41,7 +41,7 @@ fn balance_of_batch_length_mismatch_panics() {
 fn transfer_from_non_owner_panics() {
     let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
         balances: BTreeMap::from([(0, BTreeMap::from([(1, 1)]))]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 42,
             origin: 42,
         },
@@ -57,7 +57,7 @@ fn transfer_from_non_owner_panics() {
 fn transfer_exceeding_balance_panics() {
     let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
         balances: BTreeMap::from([(0, BTreeMap::from([(1, 3)]))]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 1,
             origin: 1,
         },
@@ -73,7 +73,7 @@ fn transfer_exceeding_balance_panics() {
 fn transfer_batch_from_non_owner_panics() {
     let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
         balances: BTreeMap::from([(0, BTreeMap::from([(1, 1)]))]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 42,
             origin: 42,
         },
@@ -93,7 +93,7 @@ fn transfer_batch_exceeding_balance_panics() {
             (1, BTreeMap::from([(1, 4)])),
             (2, BTreeMap::from([(1, 5)])),
         ]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 1,
             origin: 1,
         },
@@ -125,7 +125,7 @@ fn transfer_batch_length_mismatch_panics() {
 fn burn_from_non_owner_panics() {
     let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
         balances: BTreeMap::from([(2, BTreeMap::from([(1, 3)]))]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 42,
             origin: 42,
         },
@@ -141,7 +141,7 @@ fn burn_from_non_owner_panics() {
 fn burn_exceeding_balance_panics() {
     let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
         balances: BTreeMap::from([(2, BTreeMap::from([(1, 3)]))]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 1,
             origin: 1,
         },
@@ -177,7 +177,7 @@ fn burn_batch_from_non_owner_panics() {
             (1, BTreeMap::from([(1, 5)])),
             (2, BTreeMap::from([(1, 6)])),
         ]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 42,
             origin: 42,
         },
@@ -197,7 +197,7 @@ fn burn_batch_exceeding_balance_panics() {
             (1, BTreeMap::from([(1, 5)])),
             (2, BTreeMap::from([(1, 6)])),
         ]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 1,
             origin: 1,
         },
@@ -212,7 +212,7 @@ fn burn_batch_exceeding_balance_panics() {
 #[should_panic]
 fn set_approval_for_all_from_non_owner_panics() {
     let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 42,
             origin: 42,
         },
@@ -234,7 +234,7 @@ fn update_token_metadata_from_non_owner_panics() {
 
     let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
         balances: BTreeMap::from([(2, BTreeMap::from([(1, 3)]))]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 42,
             origin: 42,
         },

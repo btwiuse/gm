@@ -62,7 +62,7 @@ fn transfer_works() {
     let expected = BTreeMap::from([(0, BTreeMap::from([(1, 0), (42, 1)]))]);
     let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
         balances: BTreeMap::from([(0, BTreeMap::from([(1, 1)]))]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 1,
             origin: 1,
         },
@@ -79,7 +79,7 @@ fn transfer_from_approved_works() {
     let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
         approvals: BTreeMap::from([(1, BTreeMap::from([(42, true)]))]),
         balances: BTreeMap::from([(2, BTreeMap::from([(1, 1)]))]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 42,
             origin: 42,
         },
@@ -103,7 +103,7 @@ fn transfer_batch_works() {
             (1, BTreeMap::from([(1, 4)])),
             (2, BTreeMap::from([(1, 5)])),
         ]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 1,
             origin: 1,
         },
@@ -128,7 +128,7 @@ fn transfer_batch_from_approved_works() {
             (1, BTreeMap::from([(1, 4)])),
             (2, BTreeMap::from([(1, 5)])),
         ]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 42,
             origin: 42,
         },
@@ -144,7 +144,7 @@ fn burn_works() {
     let expected = BTreeMap::from([(2, BTreeMap::from([(1, 0)]))]);
     let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
         balances: BTreeMap::from([(2, BTreeMap::from([(1, 3)]))]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 1,
             origin: 1,
         },
@@ -161,7 +161,7 @@ fn burn_from_approved_works() {
     let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
         approvals: BTreeMap::from([(1, BTreeMap::from([(42, true)]))]),
         balances: BTreeMap::from([(2, BTreeMap::from([(1, 3)]))]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 42,
             origin: 42,
         },
@@ -186,7 +186,7 @@ fn burn_batch_works() {
             (1, BTreeMap::from([(1, 5)])),
             (2, BTreeMap::from([(1, 6)])),
         ]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 1,
             origin: 1,
         },
@@ -211,7 +211,7 @@ fn burn_batch_from_approved_works() {
             (1, BTreeMap::from([(1, 5)])),
             (2, BTreeMap::from([(1, 6)])),
         ]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 42,
             origin: 42,
         },
@@ -244,7 +244,7 @@ fn is_approved_for_all_works() {
 fn set_approval_for_all_from_sender_works() {
     let expected = BTreeMap::from([(1, BTreeMap::from([(42, false)]))]);
     let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 1,
             origin: 0,
         },
@@ -260,7 +260,7 @@ fn set_approval_for_all_from_sender_works() {
 fn set_approval_for_all_works() {
     let expected = BTreeMap::from([(1, BTreeMap::from([(42, false)]))]);
     let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 1,
             origin: 1,
         },
@@ -292,7 +292,7 @@ fn update_token_metadata_works() {
 
     let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
         balances: BTreeMap::from([(2, BTreeMap::from([(1, 3)]))]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 1,
             origin: 1,
         },
@@ -316,7 +316,7 @@ fn remove_update_token_metadata_works() {
 
     let mut contract: Contract<MockConfig> = Contract::<MockConfig> {
         balances: BTreeMap::from([(2, BTreeMap::from([(1, 3)]))]),
-        env: MockConfig {
+        ctx: MockConfig {
             sender: 1,
             origin: 1,
         },
