@@ -23,7 +23,7 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
         if from == to {
             panic!("check failed: self transfer not permitted")
         }
-        if to.is_zero() {
+        if to == T::AccountId::default() {
             panic!("check failed: transfer to black hole not permitted")
         }
     }
@@ -42,7 +42,7 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
         }
     }
     fn check_mint(&self, to: T::AccountId, token: T::TokenId, amount: T::AccountBalance) {
-        if to.is_zero() {
+        if to == T::AccountId::default() {
             panic!("check failed: cannot mint to black hole address")
         }
         if amount.is_zero() {

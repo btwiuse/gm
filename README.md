@@ -48,8 +48,8 @@ src/
 4 directories, 16 files
 ```
 
-The main contract implementation is in [./src/contract](./src/contract). It applies
-the generics pattern mentioned in
+The main contract implementation is in [./src/contract](./src/contract). It
+applies the generics pattern mentioned in
 
 https://github.com/shawntabrizi/substrate-trait-tutorial/blob/master/src/step5.rs
 

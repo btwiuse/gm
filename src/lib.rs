@@ -159,12 +159,12 @@ pub trait IConfig: Default {
 }
 
 /// token id trait alias
-pub trait ITokenId = Eq + Copy + Clone + core::hash::Hash + Ord + fmt::Debug;
+pub trait ITokenId = Eq + Copy + Clone + core::hash::Hash + Ord + fmt::Debug + Default;
 
 /// account id trait alias
 ///
 /// a method for returning the zero address is required.
-pub trait IAccountId = zero::IZero + Eq + Copy + Clone + core::hash::Hash + Ord + fmt::Debug;
+pub trait IAccountId = Eq + Copy + Clone + core::hash::Hash + Ord + fmt::Debug + Default;
 
 /// account balance trait alias
 ///
@@ -202,43 +202,4 @@ pub trait ITokenDecimal = num_traits::Zero
 /// text trait
 ///
 /// default value should be an empty string
-pub trait IText: From<String> + ToString + Clone + fmt::Debug {
-    fn default() -> Self;
-}
-
-impl IText for String {
-    fn default() -> Self {
-        String::from("")
-    }
-}
-
-/// define IZero trait required by IAccountId and implement it for ActorId and u8
-/// for gear and testing environments respectively
-mod zero {
-    use crate::*;
-
-    /// IZero is a trait with methods for obtaining / comparing with the zero address
-    pub trait IZero {
-        fn zero() -> Self;
-        fn is_zero(&self) -> bool;
-    }
-
-    impl IZero for ActorId {
-        fn zero() -> Self {
-            ActorId::zero()
-        }
-        fn is_zero(&self) -> bool {
-            *self == Self::zero()
-        }
-    }
-
-    // u8 is used as AccountId in contract_test.rs
-    impl IZero for u8 {
-        fn zero() -> Self {
-            0u8
-        }
-        fn is_zero(&self) -> bool {
-            *self == 0u8
-        }
-    }
-}
+pub trait IText = From<&'static str> + Clone + fmt::Debug + Default;

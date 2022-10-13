@@ -13,6 +13,7 @@ mod erc1155_metadata_uri;
 mod token_metadata_registry;
 
 /// Contract struct
+#[derive(Default)]
 pub struct Contract<T: IConfig> {
     pub ctx: T,
     pub owner: T::AccountId,
@@ -37,20 +38,5 @@ impl<T: IConfig> Contract<T> {
     }
     pub fn origin(&self) -> T::AccountId {
         self.ctx.origin()
-    }
-}
-
-impl<T: IConfig> Default for Contract<T> {
-    fn default() -> Self {
-        Self {
-            ctx: T::default(),
-            owner: T::AccountId::zero(),
-            name: T::Text::default(),
-            symbol: T::Text::default(),
-            base_uri: T::Text::default(),
-            balances: BTreeMap::<T::TokenId, BTreeMap<T::AccountId, T::AccountBalance>>::default(),
-            approvals: BTreeMap::<T::AccountId, BTreeMap<T::AccountId, bool>>::default(),
-            metadata_registry: BTreeMap::<T::TokenId, TokenMetadata>::default(),
-        }
     }
 }
