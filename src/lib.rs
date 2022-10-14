@@ -128,7 +128,6 @@ pub trait IConfig: Default {
     type AccountId: IAccountId;
     type Balance: IBalance;
     type Text: IText;
-    type TokenDecimal: ITokenDecimal;
     type TokenId: ITokenId;
     fn origin(&self) -> Self::AccountId;
     fn sender(&self) -> Self::AccountId;
@@ -159,21 +158,6 @@ pub trait IBalance = num_traits::Zero
     + Default
     + From<u16>
     + From<u32>;
-
-/// token decimal trait alias
-///
-/// any unsigned integer type that is at least u8 should work.
-pub trait ITokenDecimal = num_traits::Zero
-    + num_traits::One
-    + num_traits::CheckedAdd
-    + num_traits::CheckedSub
-    + num_traits::SaturatingAdd
-    + num_traits::SaturatingSub
-    + num_traits::sign::Unsigned
-    + fmt::Debug
-    + Copy
-    + Clone
-    + Default;
 
 /// text trait
 ///

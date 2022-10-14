@@ -13,7 +13,6 @@ pub struct GearConfig;
 impl IConfig for GearConfig {
     type AccountId = ActorId;
     type Balance = u128;
-    type TokenDecimal = u8;
     type TokenId = u128;
     type Text = String;
     fn origin(&self) -> Self::AccountId {
@@ -47,7 +46,6 @@ impl MockConfig {
 impl IConfig for MockConfig {
     type AccountId = u8;
     type Balance = u32;
-    type TokenDecimal = u8;
     type TokenId = u8;
     type Text = String;
     fn origin(&self) -> Self::AccountId {
