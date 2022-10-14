@@ -16,7 +16,7 @@ struct CONFIG;
 
 impl Config for CONFIG {
     type AccountId = ActorId;
-    type AccountBalance = u32;
+    type Balance = u32;
     type TokenDecimal = u8;
     type TokenId = u128;
     type Text = String;

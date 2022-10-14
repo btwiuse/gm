@@ -20,7 +20,7 @@ impl Zero for ActorId {
     }
 }
 
-pub trait IAccountBalance = num_traits::Zero
+pub trait IBalance = num_traits::Zero
     + num_traits::One
     + num_traits::CheckedAdd
     + num_traits::CheckedSub
@@ -50,7 +50,7 @@ impl IText for String {
 
 pub trait Config {
     type AccountId: IAccountId;
-    type AccountBalance: IAccountBalance;
+    type Balance: IBalance;
     type Text: IText;
     type TokenDecimal: ITokenDecimal;
     type TokenId: ITokenId;
@@ -63,7 +63,7 @@ pub trait Ownable<T: Config> {
 }
 
 pub trait Ledger<T: Config> {
-    fn balance_of(&self, who: &T::AccountId) -> T::AccountBalance;
+    fn balance_of(&self, who: &T::AccountId) -> T::Balance;
     fn balance_incr(&mut self, who: &T::AccountId);
 }
 
@@ -73,17 +73,13 @@ pub trait ERC20<T: Config> {
     fn symbol(&self) -> T::Text;
     fn name(&self) -> T::Text;
     fn decimals(&self) -> T::TokenDecimal;
-    fn total_issuance(&self) -> T::AccountBalance;
-    fn balance_of(&self, who: &T::AccountId) -> T::AccountBalance;
-    fn transfer(&mut self, to: &T::AccountId, amount: T::AccountBalance);
-    fn transfer_from(&mut self, from: &T::AccountId, to: &T::AccountId, amount: T::AccountBalance);
-    fn allowance(&self, owner: &T::AccountId, spender: &T::AccountId) -> T::AccountBalance;
-    fn emit_transfer_event(from: &T::AccountId, to: &T::AccountId, amount: &T::AccountBalance);
-    fn emit_approval_event(
-        owner: &T::AccountId,
-        spender: &T::AccountId,
-        amount: &T::AccountBalance,
-    );
+    fn total_issuance(&self) -> T::Balance;
+    fn balance_of(&self, who: &T::AccountId) -> T::Balance;
+    fn transfer(&mut self, to: &T::AccountId, amount: T::Balance);
+    fn transfer_from(&mut self, from: &T::AccountId, to: &T::AccountId, amount: T::Balance);
+    fn allowance(&self, owner: &T::AccountId, spender: &T::AccountId) -> T::Balance;
+    fn emit_transfer_event(from: &T::AccountId, to: &T::AccountId, amount: &T::Balance);
+    fn emit_approval_event(owner: &T::AccountId, spender: &T::AccountId, amount: &T::Balance);
     fn burn(&mut self);
     fn mint(&mut self);
 }
@@ -93,8 +89,8 @@ pub trait ERC721<T: Config> {
     fn symbol(&self) -> T::Text;
     fn name(&self) -> T::Text;
     fn decimals(&self) -> T::TokenDecimal;
-    fn total_issuance(&self) -> T::AccountBalance;
-    fn balance_of(&self, who: &T::AccountId) -> T::AccountBalance;
+    fn total_issuance(&self) -> T::Balance;
+    fn balance_of(&self, who: &T::AccountId) -> T::Balance;
     fn owner_of(&self, token: &T::TokenId) -> T::AccountId;
     fn safe_transfer_from(&mut self, from: &T::AccountId, to: &T::AccountId, token: &T::TokenId);
     fn transfer_from(&mut self, from: &T::AccountId, to: &T::AccountId, token: &T::TokenId);
@@ -112,16 +108,16 @@ pub trait ERC1155<T: Config> {
     // fn symbol(&self) -> T::Text;
     // fn name(&self) -> T::Text;
     // fn decimals(&self) -> T::TokenDecimal;
-    // fn total_issuance(&self) -> T::AccountBalance;
-    fn balance_of(&self, who: &T::AccountId, token: &T::TokenId) -> T::AccountBalance;
-    fn balance_of_batch(&self, who: &[T::AccountId], token: &[T::TokenId]) -> &[T::AccountBalance];
+    // fn total_issuance(&self) -> T::Balance;
+    fn balance_of(&self, who: &T::AccountId, token: &T::TokenId) -> T::Balance;
+    fn balance_of_batch(&self, who: &[T::AccountId], token: &[T::TokenId]) -> &[T::Balance];
     fn safe_transfer_from(&mut self, from: &T::AccountId, to: &T::AccountId, token: &T::TokenId);
     fn transfer_from(
         &mut self,
         from: &T::AccountId,
         to: &T::AccountId,
         token: &T::TokenId,
-        amount: &T::AccountBalance,
+        amount: &T::Balance,
     );
     fn set_approval_for_all(&mut self, operator: &T::AccountId, approved: bool);
     fn is_approved_for_all(&mut self, owner: &T::AccountId, operator: &T::AccountId) -> bool;
@@ -132,17 +128,17 @@ pub trait ERC1155<T: Config> {
         from: &T::AccountId,
         to: &T::AccountId,
         token: &T::TokenId,
-        amount: &T::AccountBalance,
+        amount: &T::Balance,
     );
     fn emit_transfer_batch_event(
         operator: &T::AccountId,
         from: &T::AccountId,
         to: &T::AccountId,
         token: &[T::TokenId],
-        amount: &[T::AccountBalance],
+        amount: &[T::Balance],
     );
     fn emit_approval_for_all_event(owner: &T::AccountId, spender: &T::AccountId, approved: bool);
     fn emit_uri_event(value: &T::Text, token: &T::TokenId);
-    fn burn(&mut self, from: &T::AccountId, token: &T::TokenId, amount: &T::AccountBalance);
-    fn mint(&mut self, to: &T::AccountId, token: &T::TokenId, amount: &T::AccountBalance);
+    fn burn(&mut self, from: &T::AccountId, token: &T::TokenId, amount: &T::Balance);
+    fn mint(&mut self, to: &T::AccountId, token: &T::TokenId, amount: &T::Balance);
 }

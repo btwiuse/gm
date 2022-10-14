@@ -16,7 +16,7 @@ struct CONFIG;
 
 impl Config for CONFIG {
     type AccountId = ActorId;
-    type AccountBalance = u8;
+    type Balance = u8;
 }
 
 static mut SELF: Option<Contract<CONFIG>> = None;

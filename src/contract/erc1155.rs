@@ -4,18 +4,14 @@ use crate::*;
 
 /// ERC1155 interface
 impl<T: IConfig> IERC1155<T> for Contract<T> {
-    fn balance_of(&self, who: T::AccountId, token: T::TokenId) -> T::AccountBalance {
+    fn balance_of(&self, who: T::AccountId, token: T::TokenId) -> T::Balance {
         *self
             .balances
             .get(&token)
             .and_then(|kv| kv.get(&who))
-            .unwrap_or(&T::AccountBalance::zero())
+            .unwrap_or(&T::Balance::zero())
     }
-    fn balance_of_batch(
-        &self,
-        who: Vec<T::AccountId>,
-        token: Vec<T::TokenId>,
-    ) -> Vec<T::AccountBalance> {
+    fn balance_of_batch(&self, who: Vec<T::AccountId>, token: Vec<T::TokenId>) -> Vec<T::Balance> {
         self.check_balance_of_batch(who.clone(), token.clone());
         token
             .iter()
@@ -28,7 +24,7 @@ impl<T: IConfig> IERC1155<T> for Contract<T> {
         from: T::AccountId,
         to: T::AccountId,
         token: T::TokenId,
-        amount: T::AccountBalance,
+        amount: T::Balance,
     ) {
         self.check_transfer_from(from, to, token, amount);
         self.balances.entry(token).and_modify(|kv| {
@@ -44,7 +40,7 @@ impl<T: IConfig> IERC1155<T> for Contract<T> {
         from: T::AccountId,
         to: T::AccountId,
         token: Vec<T::TokenId>,
-        amount: Vec<T::AccountBalance>,
+        amount: Vec<T::Balance>,
     ) {
         self.check_batch_transfer_from(from, to, token.clone(), amount.clone());
         token

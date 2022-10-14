@@ -27,36 +27,26 @@ pub trait IERC1155Check<T: IConfig> {
         from: T::AccountId,
         to: T::AccountId,
         token: T::TokenId,
-        amount: T::AccountBalance,
+        amount: T::Balance,
     );
     fn check_batch_transfer_from(
         &self,
         from: T::AccountId,
         to: T::AccountId,
         token: Vec<T::TokenId>,
-        amount: Vec<T::AccountBalance>,
+        amount: Vec<T::Balance>,
     );
     fn check_balance_of_batch(&self, who: Vec<T::AccountId>, token: Vec<T::TokenId>);
-    fn check_mint(&self, to: T::AccountId, token: T::TokenId, amount: T::AccountBalance);
-    fn check_mint_batch(
-        &self,
-        to: T::AccountId,
-        token: Vec<T::TokenId>,
-        amount: Vec<T::AccountBalance>,
-    );
+    fn check_mint(&self, to: T::AccountId, token: T::TokenId, amount: T::Balance);
+    fn check_mint_batch(&self, to: T::AccountId, token: Vec<T::TokenId>, amount: Vec<T::Balance>);
     fn check_set_approval_for_all(
         &self,
         owner: T::AccountId,
         operator: T::AccountId,
         approved: bool,
     );
-    fn check_burn(&self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance);
-    fn check_burn_batch(
-        &self,
-        from: T::AccountId,
-        token: Vec<T::TokenId>,
-        amount: Vec<T::AccountBalance>,
-    );
+    fn check_burn(&self, from: T::AccountId, token: T::TokenId, amount: T::Balance);
+    fn check_burn_batch(&self, from: T::AccountId, token: Vec<T::TokenId>, amount: Vec<T::Balance>);
     fn check_update_token_metadata(&self, token: T::TokenId, metadata: Option<TokenMetadata>);
 }
 
@@ -89,20 +79,10 @@ pub trait IERC1155GearExt {
 pub trait IERC1155Ext<T: IConfig>: IERC1155<T> {
     fn name(&self) -> T::Text;
     fn symbol(&self) -> T::Text;
-    fn burn(&mut self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance);
-    fn burn_batch(
-        &mut self,
-        from: T::AccountId,
-        token: Vec<T::TokenId>,
-        amount: Vec<T::AccountBalance>,
-    );
-    fn mint(&mut self, to: T::AccountId, token: T::TokenId, amount: T::AccountBalance);
-    fn mint_batch(
-        &mut self,
-        to: T::AccountId,
-        token: Vec<T::TokenId>,
-        amount: Vec<T::AccountBalance>,
-    );
+    fn burn(&mut self, from: T::AccountId, token: T::TokenId, amount: T::Balance);
+    fn burn_batch(&mut self, from: T::AccountId, token: Vec<T::TokenId>, amount: Vec<T::Balance>);
+    fn mint(&mut self, to: T::AccountId, token: T::TokenId, amount: T::Balance);
+    fn mint_batch(&mut self, to: T::AccountId, token: Vec<T::TokenId>, amount: Vec<T::Balance>);
 }
 
 /// ERC1155MetadataURI interface definition
@@ -121,25 +101,21 @@ pub trait ITokenMetadataRegistry<T: IConfig> {
 // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155.sol
 // https://github.com/paritytech/ink/blob/master/examples/erc1155/lib.rs
 pub trait IERC1155<T: IConfig>: IERC1155Check<T> {
-    fn balance_of(&self, who: T::AccountId, token: T::TokenId) -> T::AccountBalance;
-    fn balance_of_batch(
-        &self,
-        who: Vec<T::AccountId>,
-        token: Vec<T::TokenId>,
-    ) -> Vec<T::AccountBalance>;
+    fn balance_of(&self, who: T::AccountId, token: T::TokenId) -> T::Balance;
+    fn balance_of_batch(&self, who: Vec<T::AccountId>, token: Vec<T::TokenId>) -> Vec<T::Balance>;
     fn safe_transfer_from(
         &mut self,
         from: T::AccountId,
         to: T::AccountId,
         token: T::TokenId,
-        amount: T::AccountBalance,
+        amount: T::Balance,
     );
     fn safe_batch_transfer_from(
         &mut self,
         from: T::AccountId,
         to: T::AccountId,
         token: Vec<T::TokenId>,
-        amount: Vec<T::AccountBalance>,
+        amount: Vec<T::Balance>,
     );
     fn set_approval_for_all(&mut self, owner: T::AccountId, operator: T::AccountId, approved: bool);
     fn is_approved_for_all(&self, owner: T::AccountId, operator: T::AccountId) -> bool;
@@ -150,7 +126,7 @@ pub trait IERC1155<T: IConfig>: IERC1155Check<T> {
 /// making the contract testable without gear dependencies
 pub trait IConfig: Default {
     type AccountId: IAccountId;
-    type AccountBalance: IAccountBalance;
+    type Balance: IBalance;
     type Text: IText;
     type TokenDecimal: ITokenDecimal;
     type TokenId: ITokenId;
@@ -169,7 +145,7 @@ pub trait IAccountId = Eq + Copy + Clone + core::hash::Hash + Ord + fmt::Debug +
 /// account balance trait alias
 ///
 /// any unsigned integer type that is at least u32 should work.
-pub trait IAccountBalance = num_traits::Zero
+pub trait IBalance = num_traits::Zero
     + num_traits::One
     + num_traits::CheckedAdd
     + num_traits::CheckedSub

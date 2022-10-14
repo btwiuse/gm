@@ -20,7 +20,7 @@ pub struct Contract<T: IConfig> {
     pub name: T::Text,
     pub symbol: T::Text,
     pub base_uri: T::Text,
-    pub balances: BTreeMap<T::TokenId, BTreeMap<T::AccountId, T::AccountBalance>>,
+    pub balances: BTreeMap<T::TokenId, BTreeMap<T::AccountId, T::Balance>>,
     pub approvals: BTreeMap<T::AccountId, BTreeMap<T::AccountId, bool>>,
     pub metadata_registry: BTreeMap<T::TokenId, TokenMetadata>,
 }

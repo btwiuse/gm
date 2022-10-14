@@ -9,7 +9,7 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
         from: T::AccountId,
         to: T::AccountId,
         token: T::TokenId,
-        amount: T::AccountBalance,
+        amount: T::Balance,
     ) {
         if amount.is_zero() {
             panic!("check failed: cannot transfer 0 amount")
@@ -32,7 +32,7 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
         from: T::AccountId,
         to: T::AccountId,
         token: Vec<T::TokenId>,
-        amount: Vec<T::AccountBalance>,
+        amount: Vec<T::Balance>,
     ) {
         if token.len() != amount.len() {
             panic!("check failed: token and amount length mismatch")
@@ -41,7 +41,7 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
             self.check_transfer_from(from, to, *tk, am)
         }
     }
-    fn check_mint(&self, to: T::AccountId, token: T::TokenId, amount: T::AccountBalance) {
+    fn check_mint(&self, to: T::AccountId, token: T::TokenId, amount: T::Balance) {
         if to == T::AccountId::default() {
             panic!("check failed: cannot mint to black hole address")
         }
@@ -52,12 +52,7 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
             panic!("check failed: cannot mint twice")
         }
     }
-    fn check_mint_batch(
-        &self,
-        to: T::AccountId,
-        token: Vec<T::TokenId>,
-        amount: Vec<T::AccountBalance>,
-    ) {
+    fn check_mint_batch(&self, to: T::AccountId, token: Vec<T::TokenId>, amount: Vec<T::Balance>) {
         if token.len() != amount.len() {
             panic!("check failed: token and amount length mismatch")
         }
@@ -80,7 +75,7 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
             panic!("check failed: sender is not account owner")
         }
     }
-    fn check_burn(&self, from: T::AccountId, token: T::TokenId, amount: T::AccountBalance) {
+    fn check_burn(&self, from: T::AccountId, token: T::TokenId, amount: T::Balance) {
         if amount.is_zero() {
             panic!("check failed: cannot burn 0 amount")
         }
@@ -95,7 +90,7 @@ impl<T: IConfig> IERC1155Check<T> for Contract<T> {
         &self,
         from: T::AccountId,
         token: Vec<T::TokenId>,
-        amount: Vec<T::AccountBalance>,
+        amount: Vec<T::Balance>,
     ) {
         if token.len() != amount.len() {
             panic!("check failed: token and amount length mismatch")

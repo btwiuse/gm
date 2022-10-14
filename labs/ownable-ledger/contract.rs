@@ -5,7 +5,7 @@ use crate::BTreeMap;
 use crate::Option;
 
 pub struct Contract<T: Config> {
-    pub balances: BTreeMap<T::AccountId, T::AccountBalance>,
+    pub balances: BTreeMap<T::AccountId, T::Balance>,
     pub owner: T::AccountId,
 }
 
@@ -48,11 +48,11 @@ impl<T: Config> Ledger<T> for Contract<T> {
         use num_traits::CheckedAdd;
         use num_traits::One;
         let balance = self.balance_of(&who);
-        if let Some(balance_plus_one) = balance.checked_add(&T::AccountBalance::one()) {
+        if let Some(balance_plus_one) = balance.checked_add(&T::Balance::one()) {
             self.balances.insert(*who, balance_plus_one);
         }
     }
-    fn balance_of(&self, who: &T::AccountId) -> T::AccountBalance {
+    fn balance_of(&self, who: &T::AccountId) -> T::Balance {
         self.balances.get(&who).copied().unwrap_or_default()
     }
 }
@@ -61,7 +61,7 @@ impl<T: Config> Ledger<T> for Option<Contract<T>> {
     fn balance_incr(&mut self, who: &T::AccountId) {
         self.as_mut().unwrap().balance_incr(who)
     }
-    fn balance_of(&self, who: &T::AccountId) -> T::AccountBalance {
+    fn balance_of(&self, who: &T::AccountId) -> T::Balance {
         self.as_ref().unwrap().balance_of(who)
     }
 }

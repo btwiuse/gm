@@ -16,7 +16,7 @@ impl Zero for ActorId {
     }
 }
 
-pub trait IAccountBalance = num_traits::Zero
+pub trait IBalance = num_traits::Zero
     + num_traits::One
     + num_traits::CheckedAdd
     + num_traits::CheckedSub
@@ -26,7 +26,7 @@ pub trait IAccountBalance = num_traits::Zero
 
 pub trait Config {
     type AccountId: IAccountId;
-    type AccountBalance: IAccountBalance;
+    type Balance: IBalance;
 }
 
 pub trait Ownable<T: Config> {
@@ -35,6 +35,6 @@ pub trait Ownable<T: Config> {
 }
 
 pub trait Ledger<T: Config> {
-    fn balance_of(&self, who: &T::AccountId) -> T::AccountBalance;
+    fn balance_of(&self, who: &T::AccountId) -> T::Balance;
     fn balance_incr(&mut self, who: &T::AccountId);
 }
