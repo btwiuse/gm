@@ -1,0 +1,16 @@
+[dependencies.orig-project]
+default-features = false
+package = 'gm'
+path = '..'
+
+[features]
+
+[lib]
+crate-type = ['cdylib']
+name = 'build'
+path = "lib.rs"
+
+[package]
+edition = '2021'
+name = 'gm-wasm'
+version = '0.1.0'

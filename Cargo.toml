@@ -6,6 +6,10 @@ license = "MIT"
 authors = ["Gear Technologies", "Hangbiao Zou (btwiuse)"]
 description = "Gear Multitoken"
 
+[lib]
+crate-type = ["rlib"]
+name = "gm"
+
 [dependencies]
 gstd = { git = "https://github.com/gear-tech/gear.git", features = ["debug"] }
 scale-info = { version = "2.1.1", default-features = false, features = ["derive"] }
@@ -18,8 +22,18 @@ gtest = { git = "https://github.com/gear-tech/gear.git" }
 
 [build-dependencies]
 gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git" }
+gasm = { version = "0.0.1" }
 
 [workspace]
 members = [
+  "build",
   "labs/*",
 ]
+
+[profile.dev]
+lto = true
+opt-level = 's'
+
+[profile.release]
+lto = true
+opt-level = 's'
