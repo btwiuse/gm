@@ -10,11 +10,11 @@ authors = ["btwiuse"]
 path = "lib.rs"
 
 [dependencies]
-gstd = { git = "https://github.com/btwiuse/gear.git", features = ["debug"] }
+gstd = { git = "https://github.com/gear-tech/gear.git", features = ["debug"] }
 num-traits = { version = "0.2", default-features = false }
 
 [dev-dependencies]
-gtest = { git = "https://github.com/btwiuse/gear.git" }
+gtest = { git = "https://github.com/gear-tech/gear.git" }
 
 [build-dependencies]
-gear-wasm-builder = { git = "https://github.com/btwiuse/gear.git" }
+gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git" }
