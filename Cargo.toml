@@ -12,8 +12,8 @@ name = "gm"
 
 [dependencies]
 gstd = { git = "https://github.com/gear-tech/gear.git", features = ["debug"] }
-scale-info = { version = "2.1.1", default-features = false, features = ["derive"] }
-codec = { package = "parity-scale-codec", version = "3.1.2", default-features = false, features = ["derive"] }
+scale-info = { version = "2", default-features = false, features = ["derive"] }
+codec = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
 num-traits = { version = "0.2", default-features = false }
 primitive-types = { version = "0.12.0", default-features = false, features = ["scale-info"] }
 
@@ -22,7 +22,7 @@ gtest = { git = "https://github.com/gear-tech/gear.git" }
 
 [build-dependencies]
 gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git" }
-gasm = { version = "0.0.1" }
+# gasm = { version = "0.0.1" }
 
 [workspace]
 members = [
