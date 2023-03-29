@@ -1,10 +1,15 @@
+#![no_std]
+
 //! contract associated types configuration
 //!
 //! GearConfig is used in formal code, see state.rs.
 //!
 //! For testing purpose, MockConfig is preferred, see contract_panic_test.rs and contract_test.rs
 
-use crate::*;
+use ::parity_scale_codec::{Decode, Encode};
+use ::scale_info::TypeInfo;
+use gstd::{prelude::*, ActorId};
+pub use interface::*;
 
 /// GearConfig implements IConfig for gear environment
 #[derive(Default, Clone, Copy, Encode, Decode, TypeInfo)]

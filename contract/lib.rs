@@ -1,9 +1,12 @@
-//! contract implementation
+#![no_std]
 
-use crate::*;
+//! contract implementation
 
 use ::parity_scale_codec::{Decode, Encode};
 use ::scale_info::TypeInfo;
+use gstd::{prelude::*, ActorId};
+use interface::*;
+use io::TokenMetadata;
 
 mod contract_panic_test;
 mod contract_test;

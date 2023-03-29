@@ -1,6 +1,8 @@
 //! contract implementation
 
 use crate::*;
+use config::GearConfig;
+use io::*;
 
 /// ERC1155GearExt interface
 impl IERC1155GearExt for Contract<GearConfig> {

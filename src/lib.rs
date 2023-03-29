@@ -6,20 +6,14 @@
 
 use gstd::{prelude::*, ActorId};
 
+use config::*;
+use contract::*;
 use io::*;
 
-// pub mod codec;
-// pub mod config;
-// pub mod contract;
 pub mod handle;
 pub mod init;
-// pub mod metadata;
-// pub mod query;
 pub mod state;
 
-// pub use crate::codec::{Action, Event, Init, InitOk, Query, State, TokenMetadata};
-// pub use config::{GearConfig, MockConfig};
-// pub use contract::Contract;
 pub use state::STATE;
 
 #[no_mangle]
