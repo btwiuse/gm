@@ -4,7 +4,7 @@ all: init build test
 
 build:
 	@echo ──────────── Build release ────────────────────
-	@cargo +nightly build --release
+	@cargo +nightly build --release -p gm -p state
 	@ls -l ./target/wasm32-unknown-unknown/release/*.wasm
 
 clean:

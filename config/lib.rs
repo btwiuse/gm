@@ -9,7 +9,7 @@
 use ::parity_scale_codec::{Decode, Encode};
 use ::scale_info::TypeInfo;
 use gstd::{prelude::*, ActorId};
-pub use interface::*;
+use interface::*;
 
 /// GearConfig implements IConfig for gear environment
 #[derive(Default, Clone, Copy, Encode, Decode, TypeInfo)]

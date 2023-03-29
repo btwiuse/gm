@@ -8,6 +8,7 @@ use gstd::{prelude::*, ActorId};
 
 use config::*;
 use contract::*;
+use interface::*;
 use io::*;
 
 pub mod handle;

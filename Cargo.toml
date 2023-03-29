@@ -19,6 +19,7 @@ primitive-types = { version = "0.12.0", default-features = false, features = ["s
 io = { workspace = true }
 config = { workspace = true }
 contract = { workspace = true }
+interface = { workspace = true }
 
 [dev-dependencies]
 gtest = { git = "https://github.com/gear-tech/gear.git" }
@@ -35,6 +36,7 @@ members = [
   "io",
   "interface",
   "build",
+  "state",
   "labs/*",
 ]
 
@@ -44,6 +46,7 @@ contract = { path = "contract" }
 config = { path = "config" }
 interface = { path = "interface" }
 metadata = { path = "metadata" }
+state = { path = "state" }
 
 [profile.dev]
 lto = true

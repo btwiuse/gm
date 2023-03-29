@@ -1,0 +1,22 @@
+[package]
+name = "state"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+gstd = { git = "https://github.com/gear-tech/gear.git" }
+gmeta = { git = "https://github.com/gear-tech/gear.git", features = ["codegen"] }
+io = { workspace = true }
+config = { workspace = true }
+metadata = { workspace = true }
+interface = { workspace = true }
+
+[build-dependencies]
+gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git", features = ["metawasm"] }
+
+[features]
+binary-vendor = []
+default = ["binary-vendor"]
