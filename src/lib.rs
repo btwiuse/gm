@@ -162,4 +162,4 @@ pub trait IBalance = num_traits::Zero
 /// text trait
 ///
 /// default value should be an empty string
-pub trait IText = From<&'static str> + Clone + fmt::Debug + Default;
+pub trait IText = From<&'static str> + Clone + fmt::Debug + fmt::Display + Default;
