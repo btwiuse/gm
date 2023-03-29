@@ -7,7 +7,7 @@
 use crate::*;
 
 /// GearConfig implements IConfig for gear environment
-#[derive(Default, Clone, Copy)]
+#[derive(Default, Clone, Copy, Encode, Decode, TypeInfo)]
 pub struct GearConfig;
 
 impl IConfig for GearConfig {

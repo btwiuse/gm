@@ -33,3 +33,6 @@ pre-commit: fmt linter test
 test: build
 	@echo ──────────── Run tests ────────────────────────
 	@cargo +nightly test --release
+
+deploy:
+	deno run -A https://gear.deno.dev/deploy.ts

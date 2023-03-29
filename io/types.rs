@@ -1,20 +1,53 @@
-//! contract I/O types for initialization, transactions, state queries and events
-
 use crate::*;
-use ::codec::{Decode, Encode};
-use ::scale_info::TypeInfo;
+use gstd::{prelude::*, ActorId};
+use parity_scale_codec::{Decode, Encode};
+use scale_info::TypeInfo;
+use gmeta::{InOut, Metadata};
 
-/// contract I/O types for initialization
-pub mod init {
+pub struct ProgramMetadata;
+
+impl Metadata for ProgramMetadata {
+    type Init = InOut<Init, InitOk>;
+    type Handle = InOut<Action, Event>;
+    type Others = ();
+    type Reply = ();
+    type Signal = ();
+    type State = Contract<GearConfig>;
+}
+
+/// token metadata
+#[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone, Default)]
+pub struct TokenMetadata {
+    pub name: String,
+    pub description: String,
+    pub image_uri: String,
+    pub json_uri: String,
+}
+
+/// contract I/O types for state queries and replies
+pub mod query {
     use super::*;
-    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone, Default)]
-    pub struct Init {
-        pub name: String,
-        pub symbol: String,
-        pub base_uri: String,
+    #[derive(Debug, TypeInfo, Decode, Encode, PartialEq, Eq, Clone)]
+    pub enum Query {
+        Name,
+        Symbol,
+        BaseUri,
+        BalanceOf(ActorId, u128),
+        BalanceOfBatch(Vec<ActorId>, Vec<u128>),
+        IsApprovedForAll { owner: ActorId, operator: ActorId },
+        TokenMetadata(u128),
     }
-    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone, Default)]
-    pub struct InitOk;
+
+    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone)]
+    pub enum State {
+        Name(String),
+        Symbol(String),
+        BaseUri(String),
+        BalanceOf(u128),
+        BalanceOfBatch(Vec<u128>),
+        IsApprovedForAll(bool),
+        TokenMetadata(Option<TokenMetadata>),
+    }
 }
 
 /// contract I/O types for transactions and events
@@ -100,39 +133,17 @@ pub mod transaction {
     }
 }
 
-/// contract I/O types for state queries and replies
-pub mod query {
+/// contract I/O types for initialization
+pub mod init {
     use super::*;
-    #[derive(Debug, TypeInfo, Decode, Encode, PartialEq, Eq, Clone)]
-    pub enum Query {
-        Name,
-        Symbol,
-        BaseUri,
-        BalanceOf(ActorId, u128),
-        BalanceOfBatch(Vec<ActorId>, Vec<u128>),
-        IsApprovedForAll { owner: ActorId, operator: ActorId },
-        TokenMetadata(u128),
+    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone, Default)]
+    pub struct Init {
+        pub name: String,
+        pub symbol: String,
+        pub base_uri: String,
     }
-
-    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone)]
-    pub enum State {
-        Name(String),
-        Symbol(String),
-        BaseUri(String),
-        BalanceOf(u128),
-        BalanceOfBatch(Vec<u128>),
-        IsApprovedForAll(bool),
-        TokenMetadata(Option<TokenMetadata>),
-    }
-}
-
-/// token metadata
-#[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone, Default)]
-pub struct TokenMetadata {
-    pub name: String,
-    pub description: String,
-    pub image_uri: String,
-    pub json_uri: String,
+    #[derive(Debug, TypeInfo, Encode, Decode, PartialEq, Eq, Clone, Default)]
+    pub struct InitOk;
 }
 
 pub use self::init::*;

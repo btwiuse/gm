@@ -2,6 +2,9 @@
 
 use crate::*;
 
+use ::parity_scale_codec::{Decode, Encode};
+use ::scale_info::TypeInfo;
+
 mod contract_panic_test;
 mod contract_test;
 
@@ -13,7 +16,7 @@ mod erc1155_metadata_uri;
 mod token_metadata_registry;
 
 /// Contract struct
-#[derive(Default)]
+#[derive(Default, Clone, Encode, Decode, TypeInfo)]
 pub struct Contract<T: IConfig> {
     pub ctx: T,
     pub owner: T::AccountId,
