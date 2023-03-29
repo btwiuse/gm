@@ -1,8 +1,8 @@
 use crate::*;
+use gmeta::{InOut, Metadata};
 use gstd::{prelude::*, ActorId};
 use parity_scale_codec::{Decode, Encode};
 use scale_info::TypeInfo;
-use gmeta::{InOut, Metadata};
 
 pub struct ProgramMetadata;
 
