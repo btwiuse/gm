@@ -1,9 +1,8 @@
 #![no_std]
-
 #[no_mangle]
-unsafe extern "C" fn handle() {
+extern "C" fn handle() {
     // without this line test panics
-    gstd::msg::load_bytes();
+    let _ = gstd::msg::load_bytes();
 }
 
 #[cfg(test)]
