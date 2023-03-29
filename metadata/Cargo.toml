@@ -8,10 +8,10 @@ edition = "2021"
 path = "lib.rs"
 
 [dependencies]
-io = { path = "../io" }
-config = { path = "../config" }
-contract = { path = "../contract" }
-interface = { path = "../interface" }
+io = { workspace = true }
+config = { workspace = true }
+contract = { workspace = true }
+interface = { workspace = true }
 gstd = { git = "https://github.com/gear-tech/gear.git" }
 gmeta = { git = "https://github.com/gear-tech/gear.git" }
 scale-info = { version = "2", default-features = false }
