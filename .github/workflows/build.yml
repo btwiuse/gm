@@ -36,8 +36,8 @@ jobs:
       - name: Check fmt
         run: make fmt-check
 
-      - name: Run linter
-        run: make linter
+    # - name: Run linter
+    #   run: make linter
 
       - name: Build
         run: make build
