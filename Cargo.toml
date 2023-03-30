@@ -11,22 +11,23 @@ crate-type = ["rlib"]
 name = "gm"
 
 [dependencies]
-gstd = { git = "https://github.com/gear-tech/gear.git", features = ["debug"] }
-scale-info = { version = "2", default-features = false, features = ["derive"] }
-codec = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
-num-traits = { version = "0.2", default-features = false }
-primitive-types = { version = "0.12.0", default-features = false, features = ["scale-info"] }
 io = { workspace = true }
 config = { workspace = true }
 contract = { workspace = true }
 interface = { workspace = true }
+gstd = { workspace = true }
+gmeta = { workspace = true }
+scale-info = { workspace = true }
+parity-scale-codec = { workspace = true }
+num-traits = { workspace = true }
+primitive-types = { workspace = true }
 
 [dev-dependencies]
-gtest = { git = "https://github.com/gear-tech/gear.git" }
+gtest = { workspace = true }
 
 [build-dependencies]
-gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git" }
 metadata = { workspace = true }
+gear-wasm-builder = { workspace = true }
 
 [workspace]
 members = [
@@ -47,6 +48,14 @@ config = { path = "config" }
 interface = { path = "interface" }
 metadata = { path = "metadata" }
 state = { path = "state" }
+scale-info = { version = "2" }
+parity-scale-codec = { version = "3" }
+num-traits = { version = "0.2" }
+primitive-types = { version = "0.12.0" }
+gstd = { git = "https://github.com/gear-tech/gear.git" }
+gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git" }
+gtest = { git = "https://github.com/gear-tech/gear.git" }
+gmeta = { git = "https://github.com/gear-tech/gear.git" }
 
 [profile.dev]
 lto = true
