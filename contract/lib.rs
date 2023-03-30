@@ -8,7 +8,10 @@ use gstd::{prelude::*, ActorId};
 use interface::*;
 use io::TokenMetadata;
 
+#[cfg(test)]
 mod contract_panic_test;
+
+#[cfg(test)]
 mod contract_test;
 
 mod erc1155;

@@ -1,6 +1,7 @@
 //! contract tests
 
 use crate::*;
+use config::*;
 
 #[test]
 fn mint_works() {
