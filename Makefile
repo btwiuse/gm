@@ -30,9 +30,9 @@ linter:
 
 pre-commit: fmt linter test
 
-test: build
+test:
 	@echo ──────────── Run tests ────────────────────────
-	@cargo +nightly test --release
+	cargo test -p contract -p gm --release
 
 deploy:
 	deno run -A https://gear.deno.dev/deploy.ts
