@@ -34,4 +34,4 @@ default = ["binary-vendor"]
 # It's necessary to include all metawasm crates in the workspace section,
 # otherwise they'll be ignored by Cargo and won't be built.
 [workspace]
-members = ["state"]
+members = ["state-counts","state"]

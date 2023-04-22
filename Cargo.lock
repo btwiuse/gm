@@ -128,6 +128,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "app-state-counts"
+version = "0.1.0"
+dependencies = [
+ "app-io",
+ "gear-wasm-builder 0.1.2 (git+https://github.com/gear-tech/gear.git?branch=testnet)",
+ "gmeta 0.1.0 (git+https://github.com/gear-tech/gear.git?branch=testnet)",
+ "gstd 0.1.0 (git+https://github.com/gear-tech/gear.git?branch=testnet)",
+]
+
+[[package]]
 name = "array-bytes"
 version = "4.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
