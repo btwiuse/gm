@@ -51,6 +51,22 @@ fn process_handle() -> Result<(), ContractError> {
 }
 
 #[no_mangle]
+extern "C" fn handle_reply() {
+    process_handle_reply().expect("failed to load, decode, encode, or reply from `handle_reply()`")
+}
+
+fn process_handle_reply() -> Result<(), ContractError> {
+    let payload = msg::load()?;
+
+    match payload {
+        PingPong::Ping => reply(PingPong::Pong)?,
+        PingPong::Pong => reply(PingPong::Ping)?,
+    };
+
+    Ok(())
+}
+
+#[no_mangle]
 extern "C" fn state() {
     let state: <ContractMetadata as Metadata>::State =
         state_mut().iter().map(|(k, v)| (*k, *v)).collect();
