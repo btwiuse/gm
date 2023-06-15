@@ -16,9 +16,3 @@ pub mod init;
 pub mod state;
 
 pub use state::STATE;
-
-#[no_mangle]
-extern "C" fn metahash() {
-    let metahash: [u8; 32] = include!("../.metahash");
-    gstd::msg::reply(metahash, 0).expect("Failed to share metahash");
-}
