@@ -117,7 +117,6 @@ pub mod transaction {
         },
         Whoami {
             sender: ActorId,
-            origin: ActorId,
         },
     }
 }

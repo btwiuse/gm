@@ -14,7 +14,6 @@ impl IERC1155GearExt for Contract<GearConfig> {
         gstd::msg::reply(
             Event::Whoami {
                 sender: self.sender(),
-                origin: self.origin(),
             },
             0,
         )

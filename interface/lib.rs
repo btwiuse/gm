@@ -112,7 +112,6 @@ pub trait IConfig: Default {
     type Balance: IBalance;
     type Text: IText;
     type TokenId: ITokenId;
-    fn origin(&self) -> Self::AccountId;
     fn sender(&self) -> Self::AccountId;
 }
 

@@ -2,9 +2,7 @@
 
 //! contract implementation
 
-use ::parity_scale_codec::{Decode, Encode};
-use ::scale_info::TypeInfo;
-use gstd::{prelude::*, ActorId};
+use gstd::{collections::*, prelude::*, ActorId};
 use interface::*;
 use io::TokenMetadata;
 
@@ -44,8 +42,5 @@ impl<T: IConfig> Contract<T> {
     }
     pub fn sender(&self) -> T::AccountId {
         self.ctx.sender()
-    }
-    pub fn origin(&self) -> T::AccountId {
-        self.ctx.origin()
     }
 }
